@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>发布动态 - 智慧农业溯源</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="../assets/styles.css" rel="stylesheet">
+    <style>
+        .upload-button {
+            width: calc(50% - 10px);
+            height: 120px;
+            font-size: 20px;
+            border: 3px dashed #10b981;
+            background: #ecfdf5;
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .upload-button:hover {
+            background: #d1fae5;
+            border-color: #059669;
+        }
+        
+        .progress-circle {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: conic-gradient(#10b981 var(--progress, 0%), #e5e7eb 0%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        
+        .progress-inner {
+            width: 60px;
+            height: 60px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        
+        
+        .preview-image {
+            width: 100%;
+            max-height: 200px;
+            object-fit: cover;
+            border-radius: 12px;
+            margin: 16px 0;
+        }
+    </style>
+</head>
+<body class="bg-green-50">
+    <!-- iOS状态栏 -->
+    <div class="status-bar">
+        <div class="status-left">
+            <span>9:41</span>
+        </div>
+        <div class="status-right">
+            <i class="fas fa-signal text-sm"></i>
+            <i class="fas fa-wifi text-sm"></i>
+            <div class="battery">
+                <div class="battery-level"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 顶部导航栏 -->
+    <div class="top-nav">
+        <button onclick="goBack()" class="text-white text-xl">
+            <i class="fas fa-arrow-left"></i>
+        </button>
+        <span class="header-elderly">发布生长动态</span>
+        <div></div>
+    </div>
+
+    <!-- 主内容区域 -->
+    <div class="p-6 pb-40">
+        <!-- 拍照上传区域 -->
+        <div class="card mb-6">
+            <h2 class="title-elderly text-green-800 mb-6 text-center">添加照片或视频</h2>
+            
+            <div class="flex gap-5 mb-6">
+                <button class="upload-button" onclick="takePhoto()">
+                    <i class="fas fa-camera text-4xl text-green-600"></i>
+                    <span class="font-bold text-green-800">拍照片</span>
+                </button>
+                
+                <button class="upload-button" onclick="selectPhoto()">
+                    <i class="fas fa-image text-4xl text-green-600"></i>
+                    <span class="font-bold text-green-800">选照片</span>
+                </button>
+            </div>
+
+            <!-- 预览区域 -->
+            <div id="previewArea" class="hidden">
+                <h3 class="text-lg font-semibold text-green-800 mb-3">照片预览</h3>
+                <img id="previewImage" class="preview-image" alt="预览图片">
+                <div class="flex gap-3 mt-3">
+                    <button class="btn-large btn-secondary flex-1" onclick="retakePhoto()">
+                        <i class="fas fa-redo mr-2"></i>
+                        重新拍摄
+                    </button>
+                    <button class="btn-large btn-primary flex-1" onclick="confirmPhoto()">
+                        <i class="fas fa-check mr-2"></i>
+                        确认使用
+                    </button>
+                </div>
+            </div>
+
+            <!-- 上传进度 -->
+            <div id="uploadProgress" class="hidden text-center py-8">
+                <div class="progress-circle mx-auto mb-4" style="--progress: 0%">
+                    <div class="progress-inner" id="progressText">0%</div>
+                </div>
+                <p class="text-lg text-green-800 font-medium">正在上传，请稍等...</p>
+            </div>
+        </div>
+
+        <!-- 添加描述区域 -->
+        <div class="card mb-6">
+            <h2 class="title-elderly text-green-800 mb-6">添加描述</h2>
+            
+            <!-- 常用标签 -->
+            <div class="mb-6">
+                <h3 class="text-lg font-semibold text-green-800 mb-4">选择标签（点击即可添加）</h3>
+                <div class="tag-group">
+                    <button class="tag tag-button" onclick="addTag('施肥')">
+                        <i class="fas fa-seedling mr-2"></i>施肥
+                    </button>
+                    <button class="tag tag-button" onclick="addTag('浇水')">
+                        <i class="fas fa-tint mr-2"></i>浇水
+                    </button>
+                    <button class="tag tag-button" onclick="addTag('除草')">
+                        <i class="fas fa-cut mr-2"></i>除草
+                    </button>
+                    <button class="tag tag-button" onclick="addTag('生长记录')">
+                        <i class="fas fa-chart-line mr-2"></i>生长记录
+                    </button>
+                    <button class="tag tag-button" onclick="addTag('收获')">
+                        <i class="fas fa-hand-holding-heart mr-2"></i>收获
+                    </button>
+                    <button class="tag tag-button" onclick="addTag('播种')">
+                        <i class="fas fa-seed mr-2"></i>播种
+                    </button>
+                </div>
+            </div>
+
+            <!-- 已选标签 -->
+            <div id="selectedTags" class="mb-6 hidden">
+                <h3 class="text-lg font-semibold text-green-800 mb-3">已选标签</h3>
+                <div class="tag-group" id="selectedTagsContainer"></div>
+            </div>
+
+            <!-- 文字描述 -->
+            <div class="form-group">
+                <label class="form-label">详细描述</label>
+                <textarea 
+                    id="description" 
+                    class="form-input" 
+                    rows="4" 
+                    placeholder="可以写一些详细的描述，比如：今天的水稻长得很好..."
+                    style="min-height: 120px; font-size: 18px; line-height: 1.8;"
+                ></textarea>
+            </div>
+
+        </div>
+
+        
+    </div>
+
+    <!-- 底部发布按钮 -->
+    <div class="fixed bottom-20 left-0 right-0 bg-white border-t border-gray-200 p-6">
+        <button id="publishBtn" class="btn-large btn-primary w-full text-xl font-bold" onclick="publishPost()" disabled>
+            <i class="fas fa-paper-plane mr-3"></i>
+            确认发布
+        </button>
+    </div>
+
+    <!-- 底部导航栏 -->
+    <div class="bottom-nav">
+        <div class="nav-item" onclick="goToMyCrops()">
+            <i class="nav-icon fas fa-leaf"></i>
+            <span>我的作物</span>
+        </div>
+        <div class="nav-item active">
+            <i class="nav-icon fas fa-plus"></i>
+            <span>发布</span>
+        </div>
+        <div class="nav-item" onclick="goToMessages()">
+            <i class="nav-icon fas fa-comments"></i>
+            <span>消息</span>
+        </div>
+    </div>
+
+    <!-- 语音提示区域 -->
+    <div class="fixed top-20 left-4 right-4 z-50 hidden" id="voiceHint">
+        <div class="bg-blue-100 border border-blue-300 rounded-lg p-4 flex items-center">
+            <i class="fas fa-volume-up text-blue-600 text-xl mr-3"></i>
+            <p class="text-blue-800 text-lg font-medium" id="hintText"></p>
+        </div>
+    </div>
+
+    <!-- 发布成功提示 -->
+    <div class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50" id="successModal">
+        <div class="bg-white rounded-xl p-8 mx-6 text-center">
+            <div class="w-20 h-20 bg-green-100 rounded-full mx-auto mb-6 flex items-center justify-center">
+                <i class="fas fa-check text-3xl text-green-600"></i>
+            </div>
+            <h3 class="text-3xl font-bold text-green-800 mb-4">发布成功！</h3>
+            <p class="text-xl text-gray-600 mb-8">您的生长记录已成功发布</p>
+            <button class="btn-large btn-primary" onclick="closeSuccessModal()">
+                <i class="fas fa-home mr-2"></i>
+                返回我的作物
+            </button>
+        </div>
+    </div>
+
+    <!-- 隐藏的文件输入 -->
+    <input type="file" id="fileInput" accept="image/*" class="hidden" onchange="handleFileSelect(event)">
+
+    <script>
+        let selectedImage = null;
+        let selectedTags = [];
+        
+        // 拍照功能
+        function takePhoto() {
+            // 在实际应用中，这里会调用相机API
+            showVoiceHint('正在打开相机');
+            document.getElementById('fileInput').click();
+        }
+
+        // 选择照片
+        function selectPhoto() {
+            showVoiceHint('正在打开相册');
+            document.getElementById('fileInput').click();
+        }
+
+        // 处理文件选择
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (file) {
+                if (file.size > 10 * 1024 * 1024) { // 10MB限制
+                    showVoiceHint('照片太大了，请选择小一点的照片');
+                    return;
+                }
+                
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    selectedImage = e.target.result;
+                    document.getElementById('previewImage').src = selectedImage;
+                    document.getElementById('previewArea').classList.remove('hidden');
+                    showVoiceHint('照片已选择，请确认');
+                    checkPublishButton();
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // 重新拍摄
+        function retakePhoto() {
+            document.getElementById('previewArea').classList.add('hidden');
+            selectedImage = null;
+            showVoiceHint('请重新选择照片');
+            checkPublishButton();
+        }
+
+        // 确认照片
+        function confirmPhoto() {
+            document.getElementById('previewArea').classList.add('hidden');
+            simulateUpload();
+        }
+
+        // 模拟上传过程
+        function simulateUpload() {
+            const progressArea = document.getElementById('uploadProgress');
+            const progressCircle = progressArea.querySelector('.progress-circle');
+            const progressText = document.getElementById('progressText');
+            
+            progressArea.classList.remove('hidden');
+            showVoiceHint('开始上传照片');
+            
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += Math.random() * 15;
+                if (progress >= 100) {
+                    progress = 100;
+                    clearInterval(interval);
+                    progressArea.classList.add('hidden');
+                    showVoiceHint('照片上传成功');
+                }
+                
+                progressCircle.style.setProperty('--progress', progress + '%');
+                progressText.textContent = Math.round(progress) + '%';
+            }, 200);
+        }
+
+        // 添加标签
+        function addTag(tagText) {
+            if (!selectedTags.includes(tagText)) {
+                selectedTags.push(tagText);
+                updateSelectedTags();
+                showVoiceHint('已添加标签：' + tagText);
+                checkPublishButton();
+            }
+        }
+
+        // 移除标签
+        function removeTag(tagText) {
+            selectedTags = selectedTags.filter(tag => tag !== tagText);
+            updateSelectedTags();
+            showVoiceHint('已移除标签：' + tagText);
+            checkPublishButton();
+        }
+
+        // 更新已选标签显示
+        function updateSelectedTags() {
+            const container = document.getElementById('selectedTagsContainer');
+            const selectedTagsArea = document.getElementById('selectedTags');
+            
+            if (selectedTags.length > 0) {
+                selectedTagsArea.classList.remove('hidden');
+                container.innerHTML = selectedTags.map(tag => 
+                    `<span class="tag active cursor-pointer" onclick="removeTag('${tag}')">
+                        ${tag} <i class="fas fa-times ml-2"></i>
+                    </span>`
+                ).join('');
+            } else {
+                selectedTagsArea.classList.add('hidden');
+            }
+        }
+
+
+        // 检查发布按钮状态
+        function checkPublishButton() {
+            const publishBtn = document.getElementById('publishBtn');
+            const hasImage = selectedImage !== null;
+            const hasContent = selectedTags.length > 0 || document.getElementById('description').value.trim();
+            
+            if (hasImage && hasContent) {
+                publishBtn.disabled = false;
+                publishBtn.classList.remove('opacity-50');
+            } else {
+                publishBtn.disabled = true;
+                publishBtn.classList.add('opacity-50');
+            }
+        }
+
+        // 发布动态
+        function publishPost() {
+            if (!selectedImage) {
+                showVoiceHint('请先选择照片哦');
+                return;
+            }
+            
+            if (selectedTags.length === 0 && !document.getElementById('description').value.trim()) {
+                showVoiceHint('请添加标签或写一些描述哦');
+                return;
+            }
+            
+            // 模拟发布过程
+            showVoiceHint('正在发布，请稍等...');
+            setTimeout(() => {
+                document.getElementById('successModal').classList.remove('hidden');
+                document.getElementById('successModal').classList.add('flex');
+                showVoiceHint('发布成功！');
+            }, 2000);
+        }
+
+        // 关闭成功提示
+        function closeSuccessModal() {
+            document.getElementById('successModal').classList.add('hidden');
+            document.getElementById('successModal').classList.remove('flex');
+            // 清空表单
+            resetForm();
+        }
+
+        // 重置表单
+        function resetForm() {
+            selectedImage = null;
+            selectedTags = [];
+            document.getElementById('description').value = '';
+            document.getElementById('previewArea').classList.add('hidden');
+            updateSelectedTags();
+            checkPublishButton();
+        }
+
+        // 显示语音提示
+        function showVoiceHint(text) {
+            document.getElementById('hintText').textContent = text;
+            const hintEl = document.getElementById('voiceHint');
+            hintEl.classList.remove('hidden');
+            
+            // 语音播报
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'zh-CN';
+                utterance.rate = 0.8;
+                speechSynthesis.speak(utterance);
+            }
+            
+            // 3秒后自动隐藏
+            setTimeout(() => {
+                hintEl.classList.add('hidden');
+            }, 3000);
+        }
+
+        // 导航功能
+        function goBack() {
+            showVoiceHint('返回上一页');
+        }
+
+        function goToMyCrops() {
+            showVoiceHint('正在打开我的作物');
+        }
+
+        function goToMessages() {
+            showVoiceHint('正在打开消息中心');
+        }
+
+        // 页面加载完成
+        document.addEventListener('DOMContentLoaded', function() {
+            showVoiceHint('请选择照片开始记录作物生长');
+            
+            // 监听描述文本变化
+            document.getElementById('description').addEventListener('input', checkPublishButton);
+        });
+    </script>
+</body>
+</html>

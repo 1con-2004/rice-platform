@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智慧农业溯源系统 - 首页</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="./assets/styles.css" rel="stylesheet">
+    <style>
+        .hero-gradient {
+            background: linear-gradient(135deg, #059669 0%, #16a34a 50%, #22c55e 100%);
+        }
+        
+        .feature-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+        
+        .role-button {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            border-radius: 50px;
+            padding: 20px 40px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            font-size: 18px;
+            font-weight: 600;
+            min-width: 200px;
+        }
+        
+        .role-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+        }
+        
+        .buyer-button {
+            border-color: #3b82f6;
+            color: #3b82f6;
+        }
+        
+        .buyer-button:hover {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            color: white;
+        }
+        
+        .farmer-button {
+            border-color: #059669;
+            color: #059669;
+        }
+        
+        .farmer-button:hover {
+            background: linear-gradient(135deg, #059669, #047857);
+            color: white;
+        }
+        
+        .admin-button {
+            border-color: #7c3aed;
+            color: #7c3aed;
+        }
+        
+        .admin-button:hover {
+            background: linear-gradient(135deg, #7c3aed, #6d28d9);
+            color: white;
+        }
+        
+        .floating-element {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        .floating-element:nth-child(1) {
+            width: 80px;
+            height: 80px;
+            top: 10%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+        
+        .floating-element:nth-child(2) {
+            width: 120px;
+            height: 120px;
+            top: 20%;
+            right: 15%;
+            animation-delay: 2s;
+        }
+        
+        .floating-element:nth-child(3) {
+            width: 60px;
+            height: 60px;
+            bottom: 30%;
+            left: 15%;
+            animation-delay: 4s;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        .stats-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #059669;
+        }
+        
+        .system-flow {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            border-radius: 20px;
+            padding: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .flow-step {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            position: relative;
+        }
+        
+        .flow-arrow {
+            position: absolute;
+            right: -15px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 24px;
+            color: #059669;
+            z-index: 10;
+        }
+        
+        .hero-text {
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- iOS状态栏 -->
+    <div class="status-bar">
+        <div class="status-left">
+            <span>9:41</span>
+        </div>
+        <div class="status-right">
+            <i class="fas fa-signal text-sm"></i>
+            <i class="fas fa-wifi text-sm"></i>
+            <div class="battery">
+                <div class="battery-level"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hero区域 -->
+    <section class="hero-gradient min-h-screen relative overflow-hidden" style="padding-top: 60px;">
+        <!-- 浮动装饰元素 -->
+        <div class="floating-element"></div>
+        <div class="floating-element"></div>
+        <div class="floating-element"></div>
+        
+        <div class="container mx-auto px-6 relative z-10">
+            <!-- 主标题区域 -->
+            <div class="text-center pt-20 pb-16">
+                <div class="mb-8">
+                    <div class="inline-flex items-center justify-center w-24 h-24 bg-white bg-opacity-20 rounded-full mb-6">
+                        <i class="fas fa-seedling text-4xl text-white"></i>
+                    </div>
+                </div>
+                <h1 class="text-5xl md:text-6xl font-bold text-white mb-6 hero-text">
+                    智慧农业溯源系统
+                </h1>
+                <p class="text-xl md:text-2xl text-green-100 mb-8 max-w-3xl mx-auto leading-relaxed">
+                    从田间到餐桌，全程透明可追溯<br>
+                    让每一粒稻米都有自己的身份证
+                </p>
+                <div class="flex flex-wrap justify-center gap-4 text-green-100">
+                    <span class="inline-flex items-center gap-2 bg-white bg-opacity-20 px-4 py-2 rounded-full">
+                        <i class="fas fa-shield-alt"></i>
+                        安全可信
+                    </span>
+                    <span class="inline-flex items-center gap-2 bg-white bg-opacity-20 px-4 py-2 rounded-full">
+                        <i class="fas fa-eye"></i>
+                        全程透明
+                    </span>
+                    <span class="inline-flex items-center gap-2 bg-white bg-opacity-20 px-4 py-2 rounded-full">
+                        <i class="fas fa-users"></i>
+                        多方协作
+                    </span>
+                    <span class="inline-flex items-center gap-2 bg-white bg-opacity-20 px-4 py-2 rounded-full">
+                        <i class="fas fa-mobile-alt"></i>
+                        一键溯源
+                    </span>
+                </div>
+            </div>
+
+            <!-- 系统数据统计 -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-20">
+                <div class="feature-card p-6 text-center">
+                    <div class="stats-number">1000+</div>
+                    <p class="text-gray-600 font-medium">注册农户</p>
+                </div>
+                <div class="feature-card p-6 text-center">
+                    <div class="stats-number">5000+</div>
+                    <p class="text-gray-600 font-medium">溯源作物</p>
+                </div>
+                <div class="feature-card p-6 text-center">
+                    <div class="stats-number">50000+</div>
+                    <p class="text-gray-600 font-medium">用户查询</p>
+                </div>
+                <div class="feature-card p-6 text-center">
+                    <div class="stats-number">99.9%</div>
+                    <p class="text-gray-600 font-medium">数据准确率</p>
+                </div>
+            </div>
+
+            <!-- 用户角色选择 -->
+            <div class="text-center mb-16">
+                <h2 class="text-3xl font-bold text-white mb-4">选择您的身份</h2>
+                <p class="text-green-100 mb-12 text-lg">不同角色，专属体验</p>
+                
+                <div class="flex flex-col md:flex-row items-center justify-center gap-8">
+                    <div class="role-button buyer-button" onclick="navigateTo('buyer')">
+                        <i class="fas fa-shopping-cart text-2xl"></i>
+                        <span>我是买家</span>
+                    </div>
+                    
+                    <div class="role-button farmer-button" onclick="navigateTo('farmer')">
+                        <i class="fas fa-user-friends text-2xl"></i>
+                        <span>我是农民</span>
+                    </div>
+                    
+                    <div class="role-button admin-button" onclick="navigateTo('admin')">
+                        <i class="fas fa-cog text-2xl"></i>
+                        <span>我是管理员</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 系统特色功能 -->
+    <section class="py-20 bg-white">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold text-gray-800 mb-4">系统特色功能</h2>
+                <p class="text-xl text-gray-600">科技赋能农业，让溯源更简单</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="feature-card p-8 text-center">
+                    <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <i class="fas fa-qrcode text-2xl text-blue-600"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">一键扫码溯源</h3>
+                    <p class="text-gray-600">扫描二维码即可查看农产品完整生长过程，从种植到收获全程记录</p>
+                </div>
+
+                <div class="feature-card p-8 text-center">
+                    <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <i class="fas fa-timeline text-2xl text-green-600"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">时间线可视化</h3>
+                    <p class="text-gray-600">直观的时间线展示，清晰呈现农作物每个生长阶段的详细信息</p>
+                </div>
+
+                <div class="feature-card p-8 text-center">
+                    <div class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <i class="fas fa-comments text-2xl text-purple-600"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">社交互动功能</h3>
+                    <p class="text-gray-600">农民与消费者直接沟通，分享种植心得，增进信任关系</p>
+                </div>
+
+                <div class="feature-card p-8 text-center">
+                    <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <i class="fas fa-shield-alt text-2xl text-red-600"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">区块链保障</h3>
+                    <p class="text-gray-600">采用区块链技术确保数据不可篡改，保证溯源信息真实可靠</p>
+                </div>
+
+                <div class="feature-card p-8 text-center">
+                    <div class="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <i class="fas fa-mobile-alt text-2xl text-yellow-600"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">适老化设计</h3>
+                    <p class="text-gray-600">大字体、简单操作，让年长的农民也能轻松使用系统记录信息</p>
+                </div>
+
+                <div class="feature-card p-8 text-center">
+                    <div class="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <i class="fas fa-chart-bar text-2xl text-indigo-600"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">数据分析</h3>
+                    <p class="text-gray-600">智能数据分析，为农业生产提供科学指导，提高产量和品质</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 系统工作流程 -->
+    <section class="py-20 bg-gray-50">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold text-gray-800 mb-4">系统工作流程</h2>
+                <p class="text-xl text-gray-600">简单四步，实现全程溯源</p>
+            </div>
+
+            <div class="system-flow">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6 relative">
+                    <div class="flow-step">
+                        <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-seedling text-xl text-green-600"></i>
+                        </div>
+                        <h3 class="font-bold text-gray-800 mb-2">1. 种植记录</h3>
+                        <p class="text-gray-600 text-sm">农民记录种植信息，包括品种、时间、地点等</p>
+                        <div class="flow-arrow hidden md:block">
+                            <i class="fas fa-arrow-right"></i>
+                        </div>
+                    </div>
+
+                    <div class="flow-step">
+                        <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-camera text-xl text-blue-600"></i>
+                        </div>
+                        <h3 class="font-bold text-gray-800 mb-2">2. 过程跟踪</h3>
+                        <p class="text-gray-600 text-sm">定期上传生长照片和护理记录</p>
+                        <div class="flow-arrow hidden md:block">
+                            <i class="fas fa-arrow-right"></i>
+                        </div>
+                    </div>
+
+                    <div class="flow-step">
+                        <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-qrcode text-xl text-purple-600"></i>
+                        </div>
+                        <h3 class="font-bold text-gray-800 mb-2">3. 生成码标</h3>
+                        <p class="text-gray-600 text-sm">系统自动生成溯源二维码</p>
+                        <div class="flow-arrow hidden md:block">
+                            <i class="fas fa-arrow-right"></i>
+                        </div>
+                    </div>
+
+                    <div class="flow-step">
+                        <div class="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-search text-xl text-yellow-600"></i>
+                        </div>
+                        <h3 class="font-bold text-gray-800 mb-2">4. 消费者查询</h3>
+                        <p class="text-gray-600 text-sm">扫码查看完整溯源信息</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 联系我们 -->
+    <section class="py-20 bg-gray-800 text-white">
+        <div class="container mx-auto px-6 text-center">
+            <h2 class="text-4xl font-bold mb-4">联系我们</h2>
+            <p class="text-xl text-gray-300 mb-12">有任何问题，随时联系我们的技术团队</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div>
+                    <div class="w-16 h-16 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-phone text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">技术支持热线</h3>
+                    <p class="text-gray-300">400-888-9999</p>
+                    <p class="text-sm text-gray-400">7×24小时服务</p>
+                </div>
+
+                <div>
+                    <div class="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-envelope text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">邮箱支持</h3>
+                    <p class="text-gray-300">support@agritrack.com</p>
+                    <p class="text-sm text-gray-400">24小时内回复</p>
+                </div>
+
+                <div>
+                    <div class="w-16 h-16 bg-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-comments text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">在线客服</h3>
+                    <p class="text-gray-300">智能AI助手</p>
+                    <p class="text-sm text-gray-400">即时响应</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 页脚 -->
+    <footer class="bg-gray-900 text-white py-8">
+        <div class="container mx-auto px-6 text-center">
+            <div class="flex items-center justify-center mb-4">
+                <i class="fas fa-seedling text-2xl text-green-500 mr-3"></i>
+                <span class="text-xl font-bold">智慧农业溯源系统</span>
+            </div>
+            <p class="text-gray-400 mb-4">科技赋能农业，让每一粒稻米都有身份证</p>
+            <div class="text-sm text-gray-500">
+                <p>© 2024 智慧农业科技有限公司 版权所有</p>
+                <p>技术支持：农业大数据平台</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // 页面角色导航
+        function navigateTo(role) {
+            switch(role) {
+                case 'buyer':
+                    // 跳转到买家登录页面
+                    window.location.href = './buyer/home.html';
+                    break;
+                case 'farmer':
+                    // 跳转到农民登录页面
+                    window.location.href = './farmer/login.html';
+                    break;
+                case 'admin':
+                    // 跳转到管理员登录页面
+                    window.location.href = './admin/admin-login.html';
+                    break;
+                default:
+                    alert('页面正在开发中...');
+            }
+        }
+
+        // 页面滚动动画
+        document.addEventListener('DOMContentLoaded', function() {
+            // 平滑滚动
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+
+            const observer = new IntersectionObserver(function(entries) {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, observerOptions);
+
+            // 为所有feature-card添加动画
+            document.querySelectorAll('.feature-card').forEach(card => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(30px)';
+                card.style.transition = 'all 0.6s ease';
+                observer.observe(card);
+            });
+
+            // 角色按钮悬停效果增强
+            document.querySelectorAll('.role-button').forEach(button => {
+                button.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-5px) scale(1.05)';
+                });
+                
+                button.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0) scale(1)';
+                });
+            });
+        });
+
+        // 防止右键和开发者工具（可选的安全措施）
+        document.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+        });
+
+        // 统计数字动画
+        function animateNumbers() {
+            const numbers = document.querySelectorAll('.stats-number');
+            
+            numbers.forEach(number => {
+                const target = parseInt(number.textContent.replace(/[^\d]/g, ''));
+                const suffix = number.textContent.replace(/[\d]/g, '');
+                let current = 0;
+                const increment = target / 50;
+                
+                const timer = setInterval(() => {
+                    current += increment;
+                    if (current >= target) {
+                        current = target;
+                        clearInterval(timer);
+                    }
+                    number.textContent = Math.floor(current) + suffix;
+                }, 50);
+            });
+        }
+
+        // 当统计区域出现时开始动画
+        const statsObserver = new IntersectionObserver(function(entries) {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    animateNumbers();
+                    statsObserver.unobserve(entry.target);
+                }
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const statsSection = document.querySelector('.grid.grid-cols-1.md\\:grid-cols-4');
+            if (statsSection) {
+                statsObserver.observe(statsSection);
+            }
+        });
+    </script>
+</body>
+</html>

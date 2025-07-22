@@ -1,0 +1,247 @@
+/* 智慧农业溯源APP - 布局样式 */
+
+/* ===== iPhone 15 Pro 模拟样式 ===== */
+.phone-container {
+    width: 393px;
+    height: 852px;
+    margin: 0 auto;
+    background: #000;
+    border-radius: 47px;
+    padding: 8px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    position: relative;
+}
+
+.phone-screen {
+    width: 100%;
+    height: 100%;
+    border-radius: 39px;
+    overflow: hidden;
+    background: #fff;
+    position: relative;
+}
+
+/* iOS状态栏 */
+.status-bar {
+    height: 54px;
+    background: #000;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 24px;
+    color: #fff;
+    font-size: 15px;
+    font-weight: 600;
+    position: relative;
+    z-index: 1000;
+}
+
+.status-left {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.status-right {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.battery {
+    width: 24px;
+    height: 12px;
+    border: 1px solid #fff;
+    border-radius: 2px;
+    position: relative;
+}
+
+.battery::after {
+    content: '';
+    position: absolute;
+    right: -3px;
+    top: 3px;
+    width: 2px;
+    height: 6px;
+    background: #fff;
+    border-radius: 0 1px 1px 0;
+}
+
+.battery-level {
+    height: 100%;
+    background: #30d158;
+    border-radius: 1px;
+    width: 75%;
+}
+
+/* ===== 导航组件 ===== */
+
+/* 顶部导航栏 */
+.top-nav {
+    height: 60px;
+    background: var(--primary-green);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    font-size: var(--text-large);
+    font-weight: 600;
+}
+
+/* 底部标签栏 */
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 83px;
+    background: white;
+    border-top: 1px solid var(--border-light);
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding-bottom: 34px; /* iPhone home indicator space */
+}
+
+.nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    color: var(--text-gray);
+    font-size: 12px;
+    min-width: 60px;
+    min-height: 49px;
+    padding: 8px;
+    justify-content: center;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.nav-item.active {
+    color: var(--primary-green);
+    background: var(--light-green);
+}
+
+.nav-icon {
+    font-size: 24px;
+}
+
+/* ===== 时间线组件 ===== */
+.timeline {
+    position: relative;
+    padding: 20px;
+}
+
+.timeline-item {
+    display: flex;
+    margin-bottom: 30px;
+    position: relative;
+}
+
+.timeline-date {
+    min-width: 65px;
+    width: 65px;
+    text-align: center;
+    font-size: 14px;
+    font-weight: bold;
+    color: var(--primary-green);
+    background: var(--light-green);
+    border-radius: var(--border-radius);
+    padding: 6px 4px;
+    margin-right: 15px;
+    height: fit-content;
+    flex-shrink: 0;
+}
+
+.timeline-content {
+    flex: 1;
+    background: white;
+    border-radius: var(--border-radius);
+    padding: 16px;
+    box-shadow: var(--shadow-soft);
+    position: relative;
+}
+
+.timeline-content::before {
+    content: '';
+    position: absolute;
+    left: -8px;
+    top: 20px;
+    width: 0;
+    height: 0;
+    border-top: 8px solid transparent;
+    border-bottom: 8px solid transparent;
+    border-right: 8px solid white;
+}
+
+.timeline-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin: 12px 0;
+}
+
+/* ===== 管理端布局 ===== */
+.admin-layout {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+}
+
+.admin-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.admin-header {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: var(--border-radius);
+    padding: 20px;
+    margin-bottom: 30px;
+    color: white;
+}
+
+.admin-content {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: var(--border-radius);
+    padding: 30px;
+    box-shadow: var(--shadow-realistic);
+}
+
+/* ===== 网格布局 ===== */
+.grid {
+    display: grid;
+    gap: 20px;
+}
+
+.grid-cols-1 {
+    grid-template-columns: repeat(1, 1fr);
+}
+
+.grid-cols-2 {
+    grid-template-columns: repeat(2, 1fr);
+}
+
+.grid-cols-3 {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.grid-cols-4 {
+    grid-template-columns: repeat(4, 1fr);
+}
+
+/* 响应式网格 */
+@media (max-width: 768px) {
+    .grid-cols-2,
+    .grid-cols-3,
+    .grid-cols-4 {
+        grid-template-columns: 1fr;
+    }
+    
+    .admin-container {
+        padding: 15px;
+    }
+}

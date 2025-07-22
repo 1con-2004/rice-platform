@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智慧农业溯源APP - 高保真原型展示</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="./assets/styles.css" rel="stylesheet">
+    <style>
+        .phone-frame {
+            width: 393px;
+            height: 852px;
+            background: #000;
+            border-radius: 47px;
+            padding: 8px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            position: relative;
+        }
+        
+        .phone-screen {
+            width: 100%;
+            height: 100%;
+            border-radius: 39px;
+            overflow: hidden;
+            background: #fff;
+        }
+        
+        .prototype-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+            gap: 3rem;
+            padding: 2rem;
+        }
+        
+        .prototype-section {
+            text-align: center;
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            color: #1f2937;
+        }
+        
+        .prototype-item {
+            margin-bottom: 2rem;
+        }
+        
+        .prototype-label {
+            font-size: 0.9rem;
+            color: #6b7280;
+            margin-bottom: 0.5rem;
+        }
+        
+        iframe {
+            border: none;
+            background: #f9fafb;
+        }
+        
+        .main-header {
+            background: linear-gradient(135deg, #059669 0%, #16a34a 100%);
+            color: white;
+            padding: 2rem 0;
+            text-align: center;
+        }
+        
+        .feature-tag {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 0.25rem 0.75rem;
+            border-radius: 1rem;
+            font-size: 0.8rem;
+            margin: 0 0.25rem;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- 主标题区域 -->
+    <header class="main-header">
+        <div class="container mx-auto px-4">
+            <h1 class="text-4xl font-bold mb-4">
+                <i class="fas fa-seedling mr-3"></i>
+                智慧农业溯源APP
+            </h1>
+            <p class="text-xl mb-4">高保真原型展示 - 带有社交功能的农业全周期溯源平台</p>
+            <div class="flex flex-wrap justify-center gap-2">
+                <span class="feature-tag">适老化设计</span>
+                <span class="feature-tag">无门槛溯源</span>
+                <span class="feature-tag">时间线可视化</span>
+                <span class="feature-tag">社交互动</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- 原型展示区域 -->
+    <main class="prototype-grid">
+        <!-- 农民端界面 -->
+        <section class="prototype-section">
+            <h2 class="section-title text-green-700">
+                <i class="fas fa-user-friends mr-2"></i>
+                农民端界面 (适老化设计)
+            </h2>
+            
+            <div class="prototype-item">
+                <div class="prototype-label">登录注册页面</div>
+                <div class="phone-frame">
+                    <div class="phone-screen">
+                        <iframe src="./farmer/login.html" width="100%" height="100%"></iframe>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="prototype-item">
+                <div class="prototype-label">我的作物时间线</div>
+                <div class="phone-frame">
+                    <div class="phone-screen">
+                        <iframe src="./farmer/my-crops.html" width="100%" height="100%"></iframe>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="prototype-item">
+                <div class="prototype-label">发布动态页面</div>
+                <div class="phone-frame">
+                    <div class="phone-screen">
+                        <iframe src="./farmer/publish.html" width="100%" height="100%"></iframe>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="prototype-item">
+                <div class="prototype-label">消息中心</div>
+                <div class="phone-frame">
+                    <div class="phone-screen">
+                        <iframe src="./farmer/messages.html" width="100%" height="100%"></iframe>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="prototype-item">
+                <div class="prototype-label">个人设置</div>
+                <div class="phone-frame">
+                    <div class="phone-screen">
+                        <iframe src="./farmer/settings.html" width="100%" height="100%"></iframe>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 买家端界面 -->
+        <section class="prototype-section">
+            <h2 class="section-title text-blue-700">
+                <i class="fas fa-shopping-cart mr-2"></i>
+                买家端界面 (无门槛溯源)
+            </h2>
+            
+            <div class="prototype-item">
+                <div class="prototype-label">首页浏览</div>
+                <div class="phone-frame">
+                    <div class="phone-screen">
+                        <iframe src="./buyer/home.html" width="100%" height="100%"></iframe>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="prototype-item">
+                <div class="prototype-label">作物详情时间线</div>
+                <div class="phone-frame">
+                    <div class="phone-screen">
+                        <iframe src="./buyer/crop-detail.html" width="100%" height="100%"></iframe>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="prototype-item">
+                <div class="prototype-label">搜索页面</div>
+                <div class="phone-frame">
+                    <div class="phone-screen">
+                        <iframe src="./buyer/search.html" width="100%" height="100%"></iframe>
+                    </div>
+                </div>
+            </div>
+            
+
+        <!-- 管理员端界面 -->
+        <section class="prototype-section">
+            <h2 class="section-title text-purple-700">
+                <i class="fas fa-cog mr-2"></i>
+                管理员端界面
+            </h2>
+            
+            <div class="prototype-item">
+                <div class="prototype-label">管理员登录</div>
+                <div class="phone-frame">
+                    <div class="phone-screen">
+                        <iframe src="./admin/admin-login.html" width="100%" height="100%"></iframe>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="prototype-item">
+                <div class="prototype-label">内容审核</div>
+                <div class="phone-frame">
+                    <div class="phone-screen">
+                        <iframe src="./admin/content-review.html" width="100%" height="100%"></iframe>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="prototype-item">
+                <div class="prototype-label">用户管理</div>
+                <div class="phone-frame">
+                    <div class="phone-screen">
+                        <iframe src="./admin/user-management.html" width="100%" height="100%"></iframe>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="prototype-item">
+                <div class="prototype-label">数据统计</div>
+                <div class="phone-frame">
+                    <div class="phone-screen">
+                        <iframe src="./admin/analytics.html" width="100%" height="100%"></iframe>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 页脚信息 -->
+    <footer class="bg-gray-800 text-white py-8 text-center">
+        <div class="container mx-auto px-4">
+            <p class="text-lg font-semibold mb-2">智慧农业溯源APP - 高保真原型</p>
+            <p class="text-gray-300 mb-4">适老化设计 | 无门槛溯源 | 社交功能</p>
+            <div class="text-sm text-gray-400">
+                <p>技术栈: HTML5 + Tailwind CSS + FontAwesome</p>
+                <p>界面规格: iPhone 15 Pro (393×852px)</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

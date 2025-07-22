@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>消息中心 - 智慧农业溯源</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="../assets/styles.css" rel="stylesheet">
+    <style>
+        .message-item {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid transparent;
+            transition: all 0.2s ease;
+        }
+        
+        .message-item.unread {
+            border-left-color: #f59e0b;
+            background: #fffbeb;
+        }
+        
+        .message-item.system {
+            border-left-color: #3b82f6;
+            background: #eff6ff;
+        }
+        
+        .message-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .reply-template {
+            background: #f0fdf4;
+            border: 2px solid #bbf7d0;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin: 8px 0;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 16px;
+        }
+        
+        .reply-template:hover {
+            background: #dcfce7;
+            border-color: #86efac;
+        }
+        
+        .chat-bubble {
+            max-width: 80%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            margin: 8px 0;
+            font-size: 16px;
+            line-height: 1.5;
+        }
+        
+        .chat-bubble.buyer {
+            background: #f3f4f6;
+            margin-right: auto;
+        }
+        
+        .chat-bubble.farmer {
+            background: #10b981;
+            color: white;
+            margin-left: auto;
+        }
+        
+        .message-count {
+            display: inline-block;
+            background: #ef4444;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+            min-width: 24px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body class="bg-green-50">
+    <!-- iOS状态栏 -->
+    <div class="status-bar">
+        <div class="status-left">
+            <span>9:41</span>
+        </div>
+        <div class="status-right">
+            <i class="fas fa-signal text-sm"></i>
+            <i class="fas fa-wifi text-sm"></i>
+            <div class="battery">
+                <div class="battery-level"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 顶部导航栏 -->
+    <div class="top-nav">
+        <div class="flex items-center">
+            <i class="fas fa-comments text-2xl mr-3"></i>
+            <span class="header-elderly">消息中心</span>
+        </div>
+        <button class="text-white text-xl" onclick="markAllRead()">
+            <i class="fas fa-check-double"></i>
+        </button>
+    </div>
+
+    <!-- 消息统计 -->
+    <div class="p-6">
+        <div class="card bg-gradient-to-r from-blue-500 to-blue-600 text-white">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h2 class="text-white text-2xl font-bold mb-2">消息概览</h2>
+                    <div class="flex gap-6">
+                        <div>
+                            <p class="text-blue-100">未读消息</p>
+                            <p class="text-2xl font-bold">3</p>
+                        </div>
+                        <div>
+                            <p class="text-blue-100">总消息数</p>
+                            <p class="text-2xl font-bold">12</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="w-16 h-16 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                    <i class="fas fa-bell text-2xl"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 消息列表 -->
+    <div class="px-6 pb-24">
+        <h3 class="title-elderly text-green-800 mb-6">最新消息</h3>
+
+        <!-- 买家提问消息 -->
+        <div class="message-item unread" onclick="openChat(1)">
+            <div class="flex items-center justify-between mb-3">
+                <div class="flex items-center">
+                    <div class="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center mr-4">
+                        <i class="fas fa-user text-orange-600 text-xl"></i>
+                    </div>
+                    <div>
+                        <p class="text-lg font-semibold text-gray-800">有人问你的水稻情况</p>
+                        <p class="text-gray-600">3 人问了同样的问题</p>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <span class="message-count">3</span>
+                    <p class="text-sm text-gray-500 mt-1">2小时前</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-3">
+                <button class="btn-large btn-primary flex-1" onclick="event.stopPropagation(); quickReply('感谢关注，都是绿色种植的')">
+                    <i class="fas fa-reply mr-2"></i>
+                    一键回复
+                </button>
+                <button class="btn-large btn-secondary flex-1" onclick="openChat(1)">
+                    <i class="fas fa-eye mr-2"></i>
+                    查看详细
+                </button>
+            </div>
+        </div>
+
+        <!-- 收获提醒 -->
+        <div class="message-item system" onclick="readSystemMessage(2)">
+            <div class="flex items-center justify-between mb-3">
+                <div class="flex items-center">
+                    <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mr-4">
+                        <i class="fas fa-calendar-check text-blue-600 text-xl"></i>
+                    </div>
+                    <div>
+                        <p class="text-lg font-semibold text-gray-800">收获季节提醒</p>
+                        <p class="text-gray-600">您的水稻即将成熟</p>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <p class="text-sm text-gray-500">昨天</p>
+                </div>
+            </div>
+            <p class="text-gray-700 bg-blue-50 p-3 rounded-lg">
+                根据您的种植记录，水稻预计在15天后成熟，记得提前准备收获！
+            </p>
+        </div>
+
+        <!-- 发布提醒 -->
+        <div class="message-item system" onclick="readSystemMessage(3)">
+            <div class="flex items-center justify-between mb-3">
+                <div class="flex items-center">
+                    <div class="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center mr-4">
+                        <i class="fas fa-exclamation-triangle text-yellow-600 text-xl"></i>
+                    </div>
+                    <div>
+                        <p class="text-lg font-semibold text-gray-800">记录提醒</p>
+                        <p class="text-gray-600">好几天没有发布记录了</p>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <p class="text-sm text-gray-500">3天前</p>
+                </div>
+            </div>
+            <p class="text-gray-700 bg-yellow-50 p-3 rounded-lg">
+                您已经5天没有发布生长记录了，记得拍照记录作物的生长情况哦！
+            </p>
+            <button class="btn-large btn-primary mt-3 w-full" onclick="goToPublish()">
+                <i class="fas fa-camera mr-2"></i>
+                立即拍照记录
+            </button>
+        </div>
+
+        <!-- 已读的买家询问 -->
+        <div class="message-item" onclick="openChat(4)">
+            <div class="flex items-center justify-between mb-3">
+                <div class="flex items-center">
+                    <div class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mr-4">
+                        <i class="fas fa-user text-gray-600 text-xl"></i>
+                    </div>
+                    <div>
+                        <p class="text-lg font-semibold text-gray-800">王女士问关于农药使用</p>
+                        <p class="text-gray-600">已回复</p>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <i class="fas fa-check-circle text-green-500"></i>
+                    <p class="text-sm text-gray-500 mt-1">1周前</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 好评消息 -->
+        <div class="message-item">
+            <div class="flex items-center justify-between mb-3">
+                <div class="flex items-center">
+                    <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mr-4">
+                        <i class="fas fa-heart text-green-600 text-xl"></i>
+                    </div>
+                    <div>
+                        <p class="text-lg font-semibold text-gray-800">买家点赞</p>
+                        <p class="text-gray-600">5位买家关注了您的水稻</p>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <p class="text-sm text-gray-500">1周前</p>
+                </div>
+            </div>
+            <p class="text-gray-700 bg-green-50 p-3 rounded-lg">
+                您的水稻生长记录很受欢迎，已经有5位买家关注了！
+            </p>
+        </div>
+    </div>
+
+    <!-- 聊天对话框 -->
+    <div class="fixed inset-0 bg-white transform translate-x-full transition-transform duration-300 z-50" id="chatModal">
+        <div class="flex flex-col h-full">
+            <!-- 聊天头部 -->
+            <div class="top-nav">
+                <button onclick="closeChatModal()" class="text-white text-xl">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <span class="header-elderly" id="chatTitle">买家询问</span>
+                <div></div>
+            </div>
+
+            <!-- 聊天内容 -->
+            <div class="flex-1 overflow-y-auto p-6" id="chatContent">
+                <div class="chat-bubble buyer">
+                    您好，请问您的水稻是用什么肥料的？安全吗？
+                </div>
+                <div class="chat-bubble buyer">
+                    我想给孩子吃，比较关心食品安全
+                </div>
+                <div class="text-center text-gray-500 text-sm my-4">2小时前</div>
+            </div>
+
+            <!-- 常用回复模板 -->
+            <div class="bg-gray-50 p-4">
+                <p class="text-lg font-semibold text-gray-800 mb-3">常用回复（点击即可发送）</p>
+                <div class="space-y-2">
+                    <div class="reply-template" onclick="sendReply('感谢关注，都是绿色种植的')">
+                        感谢关注，都是绿色种植的
+                    </div>
+                    <div class="reply-template" onclick="sendReply('我们使用有机肥料，不打农药')">
+                        我们使用有机肥料，不打农药
+                    </div>
+                    <div class="reply-template" onclick="sendReply('欢迎来实地看看，地址在描述里')">
+                        欢迎来实地看看，地址在描述里
+                    </div>
+                    <div class="reply-template" onclick="sendReply('谢谢，有什么问题随时问')">
+                        谢谢，有什么问题随时问
+                    </div>
+                </div>
+            </div>
+
+            <!-- 自定义回复 -->
+            <div class="bg-white border-t border-gray-200 p-4">
+                <div class="flex gap-3 items-end">
+                    <input 
+                        type="text" 
+                        id="customReply" 
+                        class="flex-1 p-3 border border-gray-300 rounded-lg text-lg"
+                        placeholder="输入自定义回复..."
+                    >
+                    <button class="btn-large btn-primary" onclick="sendCustomReply()">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                    <button class="btn-large voice-input-btn text-white" onclick="voiceReply()">
+                        <i class="fas fa-microphone"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 底部导航栏 -->
+    <div class="bottom-nav">
+        <div class="nav-item" onclick="goToMyCrops()">
+            <i class="nav-icon fas fa-leaf"></i>
+            <span>我的作物</span>
+        </div>
+        <div class="nav-item" onclick="goToPublish()">
+            <i class="nav-icon fas fa-plus"></i>
+            <span>发布</span>
+        </div>
+        <div class="nav-item active">
+            <i class="nav-icon fas fa-comments"></i>
+            <span>消息</span>
+        </div>
+    </div>
+
+    <!-- 语音提示区域 -->
+    <div class="fixed top-20 left-4 right-4 z-40 hidden" id="voiceHint">
+        <div class="bg-blue-100 border border-blue-300 rounded-lg p-4 flex items-center">
+            <i class="fas fa-volume-up text-blue-600 text-xl mr-3"></i>
+            <p class="text-blue-800 text-lg font-medium" id="hintText"></p>
+        </div>
+    </div>
+
+    <script>
+        // 打开聊天对话
+        function openChat(messageId) {
+            const chatModal = document.getElementById('chatModal');
+            chatModal.classList.remove('translate-x-full');
+            showVoiceHint('正在打开对话');
+            
+            // 模拟加载聊天记录
+            setTimeout(() => {
+                readMessage('您有新的买家询问，请查看并回复');
+            }, 500);
+        }
+
+        // 关闭聊天对话
+        function closeChatModal() {
+            const chatModal = document.getElementById('chatModal');
+            chatModal.classList.add('translate-x-full');
+        }
+
+        // 发送预设回复
+        function sendReply(message) {
+            const chatContent = document.getElementById('chatContent');
+            const replyHtml = `
+                <div class="chat-bubble farmer">
+                    ${message}
+                </div>
+                <div class="text-center text-gray-500 text-sm my-2">刚刚</div>
+            `;
+            chatContent.insertAdjacentHTML('beforeend', replyHtml);
+            chatContent.scrollTop = chatContent.scrollHeight;
+            
+            showVoiceHint('回复已发送：' + message);
+            
+            // 3秒后自动关闭聊天框
+            setTimeout(() => {
+                closeChatModal();
+                showVoiceHint('回复成功，买家会收到您的消息');
+            }, 2000);
+        }
+
+        // 发送自定义回复
+        function sendCustomReply() {
+            const input = document.getElementById('customReply');
+            const message = input.value.trim();
+            
+            if (!message) {
+                showVoiceHint('请先输入回复内容');
+                return;
+            }
+            
+            sendReply(message);
+            input.value = '';
+        }
+
+        // 语音回复
+        function voiceReply() {
+            if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+                showVoiceHint('您的浏览器不支持语音识别');
+                return;
+            }
+
+            const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+            recognition.lang = 'zh-CN';
+            recognition.continuous = false;
+            recognition.interimResults = false;
+
+            showVoiceHint('请开始说话...');
+            
+            recognition.onresult = function(event) {
+                const result = event.results[0][0].transcript;
+                sendReply(result);
+            };
+
+            recognition.onerror = function(event) {
+                showVoiceHint('语音识别出错，请重试');
+            };
+
+            recognition.start();
+        }
+
+        // 快速回复
+        function quickReply(message) {
+            showVoiceHint('正在发送回复：' + message);
+            setTimeout(() => {
+                showVoiceHint('回复已发送，买家会收到您的消息');
+            }, 1500);
+        }
+
+        // 读取系统消息
+        function readSystemMessage(messageId) {
+            if (messageId === 3) {
+                readMessage('您已经5天没有发布生长记录了，记得拍照记录作物的生长情况哦');
+            } else {
+                readMessage('系统消息已读取');
+            }
+        }
+
+        // 全部标为已读
+        function markAllRead() {
+            showVoiceHint('所有消息已标为已读');
+            // 移除未读标记
+            document.querySelectorAll('.message-item.unread').forEach(item => {
+                item.classList.remove('unread');
+            });
+            // 更新未读计数
+            document.querySelector('.message-count').textContent = '0';
+        }
+
+        // 语音朗读消息
+        function readMessage(text) {
+            showVoiceHint(text);
+        }
+
+        // 显示语音提示
+        function showVoiceHint(text) {
+            document.getElementById('hintText').textContent = text;
+            const hintEl = document.getElementById('voiceHint');
+            hintEl.classList.remove('hidden');
+            
+            // 语音播报
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'zh-CN';
+                utterance.rate = 0.8;
+                speechSynthesis.speak(utterance);
+            }
+            
+            // 3秒后自动隐藏
+            setTimeout(() => {
+                hintEl.classList.add('hidden');
+            }, 3000);
+        }
+
+        // 导航功能
+        function goToMyCrops() {
+            showVoiceHint('正在打开我的作物');
+        }
+
+        function goToPublish() {
+            showVoiceHint('正在打开发布页面');
+        }
+
+        // 页面加载完成
+        document.addEventListener('DOMContentLoaded', function() {
+            showVoiceHint('您有3条未读消息');
+            
+            // 自动播报最新消息
+            setTimeout(() => {
+                readMessage('有人问你的水稻情况，点击查看并回复');
+            }, 2000);
+        });
+
+        // 监听自定义回复输入框回车事件
+        document.getElementById('customReply').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendCustomReply();
+            }
+        });
+    </script>
+</body>
+</html>

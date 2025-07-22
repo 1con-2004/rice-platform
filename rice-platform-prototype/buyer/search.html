@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>搜索 - 智慧农业溯源</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="../assets/styles.css" rel="stylesheet">
+    <style>
+        .search-header {
+            background: white;
+            padding: 16px 20px;
+            border-bottom: 1px solid #e5e7eb;
+            position: sticky;
+            top: 54px;
+            z-index: 100;
+        }
+        
+        .search-input {
+            background: #f9fafb;
+            border: 2px solid #e5e7eb;
+            border-radius: 25px;
+            padding: 12px 20px 12px 48px;
+            width: 100%;
+            font-size: 16px;
+            transition: all 0.2s ease;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: #16a34a;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1);
+        }
+        
+        .search-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9ca3af;
+            font-size: 18px;
+        }
+        
+        .filter-chip {
+            display: inline-flex;
+            align-items: center;
+            padding: 8px 16px;
+            background: #f3f4f6;
+            color: #374151;
+            border-radius: 20px;
+            margin-right: 12px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 14px;
+            white-space: nowrap;
+        }
+        
+        .filter-chip.active {
+            background: #16a34a;
+            color: white;
+        }
+        
+        .filter-chip:hover {
+            background: #e5e7eb;
+        }
+        
+        .filter-chip.active:hover {
+            background: #059669;
+        }
+        
+        .hot-search-item {
+            display: inline-block;
+            padding: 6px 12px;
+            background: #fef3c7;
+            color: #d97706;
+            border-radius: 16px;
+            margin-right: 8px;
+            margin-bottom: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .hot-search-item:hover {
+            background: #fbbf24;
+            color: white;
+        }
+        
+        .history-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #f3f4f6;
+            cursor: pointer;
+        }
+        
+        .history-item:hover {
+            background: #f9fafb;
+        }
+        
+        .search-result-card {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: all 0.2s ease;
+        }
+        
+        .search-result-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+        
+        .result-image {
+            width: 80px;
+            height: 80px;
+            border-radius: 8px;
+            object-fit: cover;
+            margin-right: 16px;
+        }
+        
+        .no-results {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6b7280;
+        }
+        
+        .no-results-icon {
+            width: 80px;
+            height: 80px;
+            background: #f3f4f6;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 32px;
+            color: #9ca3af;
+        }
+        
+        .loading-skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+            border-radius: 8px;
+        }
+        
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+        
+        .search-suggestions {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-top: none;
+            border-radius: 0 0 12px 12px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+        }
+        
+        .suggestion-item {
+            padding: 12px 20px;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+        
+        .suggestion-item:hover {
+            background: #f9fafb;
+        }
+        
+        .advanced-filter {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- iOS状态栏 -->
+    <div class="status-bar">
+        <div class="status-left">
+            <span>9:41</span>
+        </div>
+        <div class="status-right">
+            <i class="fas fa-signal text-sm"></i>
+            <i class="fas fa-wifi text-sm"></i>
+            <div class="battery">
+                <div class="battery-level"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 搜索头部 -->
+    <div class="search-header">
+        <div class="relative">
+            <i class="search-icon fas fa-search"></i>
+            <input type="text" 
+                   class="search-input" 
+                   placeholder="搜索作物类型、农场名称、地区..."
+                   id="searchInput"
+                   autocomplete="off">
+            <button class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    onclick="clearSearch()" id="clearBtn" style="display: none;">
+                <i class="fas fa-times"></i>
+            </button>
+            
+            <!-- 搜索建议 -->
+            <div class="search-suggestions" id="searchSuggestions">
+                <div class="suggestion-item" onclick="selectSuggestion('优质水稻')">
+                    <i class="fas fa-search text-gray-400 mr-3"></i>优质水稻
+                </div>
+                <div class="suggestion-item" onclick="selectSuggestion('有机小麦')">
+                    <i class="fas fa-search text-gray-400 mr-3"></i>有机小麦
+                </div>
+                <div class="suggestion-item" onclick="selectSuggestion('绿色蔬菜')">
+                    <i class="fas fa-search text-gray-400 mr-3"></i>绿色蔬菜
+                </div>
+            </div>
+        </div>
+        
+        <div class="flex items-center justify-between mt-3">
+            <button onclick="goBack()" class="text-gray-600 hover:text-gray-800">
+                <i class="fas fa-arrow-left mr-2"></i>返回
+            </button>
+            <button onclick="toggleAdvancedFilter()" class="text-green-600 hover:text-green-800" id="filterToggle">
+                <i class="fas fa-filter mr-2"></i>筛选
+            </button>
+        </div>
+    </div>
+
+    <!-- 高级筛选 -->
+    <div class="px-6 pt-4" id="advancedFilter" style="display: none;">
+        <div class="advanced-filter">
+            <h4 class="font-bold text-gray-800 mb-4">筛选条件</h4>
+            
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-2">作物类型</label>
+                <div class="flex flex-wrap">
+                    <span class="filter-chip" onclick="toggleFilter(this)" data-filter="type" data-value="rice">水稻</span>
+                    <span class="filter-chip" onclick="toggleFilter(this)" data-filter="type" data-value="wheat">小麦</span>
+                    <span class="filter-chip" onclick="toggleFilter(this)" data-filter="type" data-value="corn">玉米</span>
+                    <span class="filter-chip" onclick="toggleFilter(this)" data-filter="type" data-value="vegetable">蔬菜</span>
+                    <span class="filter-chip" onclick="toggleFilter(this)" data-filter="type" data-value="fruit">果树</span>
+                </div>
+            </div>
+            
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-2">生长阶段</label>
+                <div class="flex flex-wrap">
+                    <span class="filter-chip" onclick="toggleFilter(this)" data-filter="stage" data-value="growing">生长中</span>
+                    <span class="filter-chip" onclick="toggleFilter(this)" data-filter="stage" data-value="flowering">开花期</span>
+                    <span class="filter-chip" onclick="toggleFilter(this)" data-filter="stage" data-value="harvesting">收获期</span>
+                    <span class="filter-chip" onclick="toggleFilter(this)" data-filter="stage" data-value="completed">已收获</span>
+                </div>
+            </div>
+            
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-2">地区</label>
+                <div class="flex flex-wrap">
+                    <span class="filter-chip" onclick="toggleFilter(this)" data-filter="region" data-value="jiangsu">江苏</span>
+                    <span class="filter-chip" onclick="toggleFilter(this)" data-filter="region" data-value="shandong">山东</span>
+                    <span class="filter-chip" onclick="toggleFilter(this)" data-filter="region" data-value="hebei">河北</span>
+                    <span class="filter-chip" onclick="toggleFilter(this)" data-filter="region" data-value="zhejiang">浙江</span>
+                    <span class="filter-chip" onclick="toggleFilter(this)" data-filter="region" data-value="hunan">湖南</span>
+                </div>
+            </div>
+            
+            <div class="flex gap-3">
+                <button class="flex-1 btn-large btn-secondary" onclick="clearFilters()">
+                    清除筛选
+                </button>
+                <button class="flex-1 btn-large btn-primary" onclick="applyFilters()">
+                    应用筛选
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 主内容区域 -->
+    <div class="px-6">
+        <!-- 搜索前状态 -->
+        <div id="beforeSearch">
+            <!-- 热门搜索 -->
+            <div class="mb-6">
+                <h3 class="text-lg font-bold text-gray-800 mb-4">热门搜索</h3>
+                <div class="flex flex-wrap">
+                    <span class="hot-search-item" onclick="searchKeyword('有机水稻')">有机水稻</span>
+                    <span class="hot-search-item" onclick="searchKeyword('绿色小麦')">绿色小麦</span>
+                    <span class="hot-search-item" onclick="searchKeyword('新鲜蔬菜')">新鲜蔬菜</span>
+                    <span class="hot-search-item" onclick="searchKeyword('甜玉米')">甜玉米</span>
+                    <span class="hot-search-item" onclick="searchKeyword('有机果树')">有机果树</span>
+                    <span class="hot-search-item" onclick="searchKeyword('江苏农场')">江苏农场</span>
+                </div>
+            </div>
+
+            <!-- 搜索历史 -->
+            <div class="mb-6" id="searchHistory">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-bold text-gray-800">搜索历史</h3>
+                    <button class="text-gray-500 text-sm" onclick="clearHistory()">
+                        <i class="fas fa-trash mr-1"></i>清除
+                    </button>
+                </div>
+                <div class="bg-white rounded-12 p-4">
+                    <div class="history-item" onclick="searchKeyword('张大爷的水稻')">
+                        <i class="fas fa-history text-gray-400 mr-3"></i>
+                        <span class="flex-1">张大爷的水稻</span>
+                        <i class="fas fa-arrow-up-right-from-square text-gray-400"></i>
+                    </div>
+                    <div class="history-item" onclick="searchKeyword('有机小麦')">
+                        <i class="fas fa-history text-gray-400 mr-3"></i>
+                        <span class="flex-1">有机小麦</span>
+                        <i class="fas fa-arrow-up-right-from-square text-gray-400"></i>
+                    </div>
+                    <div class="history-item" onclick="searchKeyword('山东玉米')">
+                        <i class="fas fa-history text-gray-400 mr-3"></i>
+                        <span class="flex-1">山东玉米</span>
+                        <i class="fas fa-arrow-up-right-from-square text-gray-400"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 推荐农场 -->
+            <div class="mb-6">
+                <h3 class="text-lg font-bold text-gray-800 mb-4">推荐农场</h3>
+                <div class="search-result-card" onclick="openCropDetail(1)">
+                    <div class="flex">
+                        <img src="https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=80&h=80&fit=crop" 
+                             alt="推荐农场" class="result-image">
+                        <div class="flex-1">
+                            <h4 class="font-bold text-gray-800 mb-1">张大爷的生态农场</h4>
+                            <p class="text-sm text-gray-600 mb-2">江苏省扬州市 · 有机认证</p>
+                            <p class="text-xs text-gray-500 mb-2">主营：水稻、小麦 | 记录完整 | 关注度1.2k</p>
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs bg-green-100 text-green-600 px-2 py-1 rounded">生长中</span>
+                                <span class="text-xs text-gray-400">89天记录</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 搜索结果 -->
+        <div id="searchResults" style="display: none;">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-bold text-gray-800" id="resultsTitle">搜索结果</h3>
+                <span class="text-sm text-gray-500" id="resultsCount">找到 0 个结果</span>
+            </div>
+            
+            <!-- 结果列表 -->
+            <div id="resultsList">
+                <!-- 搜索结果将动态插入这里 -->
+            </div>
+        </div>
+
+        <!-- 无结果状态 -->
+        <div id="noResults" class="no-results" style="display: none;">
+            <div class="no-results-icon">
+                <i class="fas fa-search"></i>
+            </div>
+            <h3 class="text-lg font-bold text-gray-800 mb-2">没有找到相关结果</h3>
+            <p class="text-gray-600 mb-6">试试搜索其他关键词，或者调整筛选条件</p>
+            <div class="space-y-2">
+                <p class="text-sm text-gray-500">建议搜索：</p>
+                <div class="flex flex-wrap justify-center gap-2">
+                    <span class="hot-search-item" onclick="searchKeyword('水稻')">水稻</span>
+                    <span class="hot-search-item" onclick="searchKeyword('小麦')">小麦</span>
+                    <span class="hot-search-item" onclick="searchKeyword('有机')">有机</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 加载状态 -->
+        <div id="loadingResults" style="display: none;">
+            <div class="space-y-4">
+                <div class="search-result-card">
+                    <div class="flex">
+                        <div class="loading-skeleton w-20 h-20 rounded-lg mr-4"></div>
+                        <div class="flex-1">
+                            <div class="loading-skeleton h-4 w-3/4 mb-2"></div>
+                            <div class="loading-skeleton h-3 w-1/2 mb-2"></div>
+                            <div class="loading-skeleton h-3 w-2/3"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="search-result-card">
+                    <div class="flex">
+                        <div class="loading-skeleton w-20 h-20 rounded-lg mr-4"></div>
+                        <div class="flex-1">
+                            <div class="loading-skeleton h-4 w-3/4 mb-2"></div>
+                            <div class="loading-skeleton h-3 w-1/2 mb-2"></div>
+                            <div class="loading-skeleton h-3 w-2/3"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentFilters = {
+            type: [],
+            stage: [],
+            region: []
+        };
+        let searchTimeout;
+
+        // 搜索功能
+        function performSearch(keyword) {
+            if (!keyword.trim()) {
+                showBeforeSearch();
+                return;
+            }
+
+            // 添加到搜索历史
+            addToHistory(keyword);
+
+            // 显示加载状态
+            showLoading();
+
+            // 模拟搜索延迟
+            setTimeout(() => {
+                const results = mockSearch(keyword);
+                displayResults(keyword, results);
+            }, 1500);
+        }
+
+        // 模拟搜索API
+        function mockSearch(keyword) {
+            const mockData = [
+                {
+                    id: 1,
+                    name: '张大爷的优质水稻',
+                    location: '江苏省扬州市',
+                    type: '水稻',
+                    stage: '生长中',
+                    days: 89,
+                    records: 12,
+                    followers: '1.2k',
+                    image: 'https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=80&h=80&fit=crop',
+                    organic: true
+                },
+                {
+                    id: 2,
+                    name: '李农户的黄金小麦',
+                    location: '山东省济南市',
+                    type: '小麦',
+                    stage: '收获期',
+                    days: 156,
+                    records: 28,
+                    followers: '856',
+                    image: 'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=80&h=80&fit=crop',
+                    organic: false
+                },
+                {
+                    id: 3,
+                    name: '王大叔的甜玉米',
+                    location: '河北省保定市',
+                    type: '玉米',
+                    stage: '生长中',
+                    days: 67,
+                    records: 15,
+                    followers: '632',
+                    image: 'https://images.unsplash.com/photo-1586771107445-d3ca888129ff?w=80&h=80&fit=crop',
+                    organic: true
+                }
+            ];
+
+            // 简单的关键词匹配
+            return mockData.filter(item => 
+                item.name.toLowerCase().includes(keyword.toLowerCase()) ||
+                item.type.toLowerCase().includes(keyword.toLowerCase()) ||
+                item.location.toLowerCase().includes(keyword.toLowerCase())
+            );
+        }
+
+        // 显示搜索结果
+        function displayResults(keyword, results) {
+            hideLoading();
+            hideBeforeSearch();
+
+            if (results.length === 0) {
+                showNoResults();
+                return;
+            }
+
+            showResults();
+            document.getElementById('resultsTitle').textContent = `"${keyword}" 的搜索结果`;
+            document.getElementById('resultsCount').textContent = `找到 ${results.length} 个结果`;
+
+            const resultsList = document.getElementById('resultsList');
+            resultsList.innerHTML = results.map(item => `
+                <div class="search-result-card" onclick="openCropDetail(${item.id})">
+                    <div class="flex">
+                        <img src="${item.image}" alt="${item.name}" class="result-image">
+                        <div class="flex-1">
+                            <div class="flex items-center justify-between mb-1">
+                                <h4 class="font-bold text-gray-800">${item.name}</h4>
+                                ${item.organic ? '<span class="text-xs bg-green-100 text-green-600 px-2 py-1 rounded">有机</span>' : ''}
+                            </div>
+                            <p class="text-sm text-gray-600 mb-2">${item.location} · ${item.type}</p>
+                            <p class="text-xs text-gray-500 mb-2">${item.records}条记录 | ${item.followers} 关注 | 第${item.days}天</p>
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs ${getStageClass(item.stage)} px-2 py-1 rounded">${item.stage}</span>
+                                <span class="text-xs text-gray-400">实时更新</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // 获取阶段样式类
+        function getStageClass(stage) {
+            switch(stage) {
+                case '生长中': return 'bg-green-100 text-green-600';
+                case '收获期': return 'bg-orange-100 text-orange-600';
+                case '已收获': return 'bg-blue-100 text-blue-600';
+                default: return 'bg-gray-100 text-gray-600';
+            }
+        }
+
+        // 显示/隐藏不同状态
+        function showBeforeSearch() {
+            document.getElementById('beforeSearch').style.display = 'block';
+            document.getElementById('searchResults').style.display = 'none';
+            document.getElementById('noResults').style.display = 'none';
+            document.getElementById('loadingResults').style.display = 'none';
+        }
+
+        function showResults() {
+            document.getElementById('beforeSearch').style.display = 'none';
+            document.getElementById('searchResults').style.display = 'block';
+            document.getElementById('noResults').style.display = 'none';
+            document.getElementById('loadingResults').style.display = 'none';
+        }
+
+        function showNoResults() {
+            document.getElementById('beforeSearch').style.display = 'none';
+            document.getElementById('searchResults').style.display = 'none';
+            document.getElementById('noResults').style.display = 'block';
+            document.getElementById('loadingResults').style.display = 'none';
+        }
+
+        function showLoading() {
+            document.getElementById('beforeSearch').style.display = 'none';
+            document.getElementById('searchResults').style.display = 'none';
+            document.getElementById('noResults').style.display = 'none';
+            document.getElementById('loadingResults').style.display = 'block';
+        }
+
+        function hideLoading() {
+            document.getElementById('loadingResults').style.display = 'none';
+        }
+
+        function hideBeforeSearch() {
+            document.getElementById('beforeSearch').style.display = 'none';
+        }
+
+        // 搜索关键词
+        function searchKeyword(keyword) {
+            document.getElementById('searchInput').value = keyword;
+            performSearch(keyword);
+            updateClearButton();
+        }
+
+        // 添加到搜索历史
+        function addToHistory(keyword) {
+            let history = JSON.parse(localStorage.getItem('searchHistory') || '[]');
+            history = history.filter(item => item !== keyword);
+            history.unshift(keyword);
+            history = history.slice(0, 10); // 最多保存10条
+            localStorage.setItem('searchHistory', JSON.stringify(history));
+        }
+
+        // 清除搜索历史
+        function clearHistory() {
+            localStorage.removeItem('searchHistory');
+            document.getElementById('searchHistory').style.display = 'none';
+        }
+
+        // 清除搜索
+        function clearSearch() {
+            document.getElementById('searchInput').value = '';
+            showBeforeSearch();
+            updateClearButton();
+            hideSuggestions();
+        }
+
+        // 更新清除按钮显示
+        function updateClearButton() {
+            const input = document.getElementById('searchInput');
+            const clearBtn = document.getElementById('clearBtn');
+            clearBtn.style.display = input.value ? 'block' : 'none';
+        }
+
+        // 选择搜索建议
+        function selectSuggestion(suggestion) {
+            searchKeyword(suggestion);
+            hideSuggestions();
+        }
+
+        // 显示/隐藏搜索建议
+        function showSuggestions() {
+            document.getElementById('searchSuggestions').style.display = 'block';
+        }
+
+        function hideSuggestions() {
+            document.getElementById('searchSuggestions').style.display = 'none';
+        }
+
+        // 切换高级筛选
+        function toggleAdvancedFilter() {
+            const filter = document.getElementById('advancedFilter');
+            const toggle = document.getElementById('filterToggle');
+            
+            if (filter.style.display === 'none') {
+                filter.style.display = 'block';
+                toggle.innerHTML = '<i class="fas fa-times mr-2"></i>收起';
+            } else {
+                filter.style.display = 'none';
+                toggle.innerHTML = '<i class="fas fa-filter mr-2"></i>筛选';
+            }
+        }
+
+        // 切换筛选条件
+        function toggleFilter(element) {
+            element.classList.toggle('active');
+            const filter = element.getAttribute('data-filter');
+            const value = element.getAttribute('data-value');
+            
+            if (element.classList.contains('active')) {
+                if (!currentFilters[filter].includes(value)) {
+                    currentFilters[filter].push(value);
+                }
+            } else {
+                currentFilters[filter] = currentFilters[filter].filter(item => item !== value);
+            }
+        }
+
+        // 清除筛选条件
+        function clearFilters() {
+            document.querySelectorAll('.filter-chip.active').forEach(chip => {
+                chip.classList.remove('active');
+            });
+            currentFilters = { type: [], stage: [], region: [] };
+        }
+
+        // 应用筛选条件
+        function applyFilters() {
+            const keyword = document.getElementById('searchInput').value;
+            performSearch(keyword);
+            toggleAdvancedFilter();
+        }
+
+        // 打开作物详情
+        function openCropDetail(cropId) {
+            console.log('打开作物详情：', cropId);
+            // 实际应用中这里会导航到作物详情页面
+        }
+
+        // 返回上一页
+        function goBack() {
+            history.back();
+        }
+
+        // 页面加载完成
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('searchInput');
+            
+            // 搜索输入事件
+            searchInput.addEventListener('input', function() {
+                clearTimeout(searchTimeout);
+                updateClearButton();
+                
+                if (this.value.trim()) {
+                    showSuggestions();
+                    searchTimeout = setTimeout(() => {
+                        performSearch(this.value);
+                    }, 500);
+                } else {
+                    hideSuggestions();
+                    showBeforeSearch();
+                }
+            });
+
+            // 搜索框焦点事件
+            searchInput.addEventListener('focus', function() {
+                if (this.value.trim()) {
+                    showSuggestions();
+                }
+            });
+
+            // 点击外部隐藏建议
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('.search-header')) {
+                    hideSuggestions();
+                }
+            });
+
+            // 加载搜索历史
+            const history = JSON.parse(localStorage.getItem('searchHistory') || '[]');
+            if (history.length === 0) {
+                document.getElementById('searchHistory').style.display = 'none';
+            }
+
+            // 自动获取焦点
+            searchInput.focus();
+        });
+    </script>
+</body>
+</html>

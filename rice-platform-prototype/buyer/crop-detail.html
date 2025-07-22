@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>张大爷的优质水稻 - 生长轨迹</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="../assets/styles.css" rel="stylesheet">
+    <style>
+        .hero-image {
+            height: 240px;
+            background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.1)), url('https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=400&h=240&fit=crop');
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: end;
+            padding: 24px;
+            color: white;
+            position: relative;
+        }
+        
+        .timeline-vertical {
+            position: relative;
+            padding-left: 30px;
+        }
+        
+        .timeline-vertical::before {
+            content: '';
+            position: absolute;
+            left: 15px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #d1d5db;
+        }
+        
+        .timeline-item-vertical {
+            position: relative;
+            margin-bottom: 32px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        .timeline-item-vertical::before {
+            content: '';
+            position: absolute;
+            left: -22px;
+            top: 20px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #16a34a;
+            border: 3px solid white;
+            box-shadow: 0 0 0 2px #16a34a;
+        }
+        
+        .timeline-item-vertical.today::before {
+            background: #f59e0b;
+            box-shadow: 0 0 0 2px #f59e0b;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        .crop-image-detail {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .crop-image-detail:hover {
+            transform: scale(1.02);
+        }
+        
+        .day-selector {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .day-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+            margin-top: 12px;
+        }
+        
+        .day-item {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .day-item.has-record {
+            background: #dcfce7;
+            color: #16a34a;
+        }
+        
+        .day-item.today {
+            background: #fbbf24;
+            color: white;
+        }
+        
+        .day-item:hover {
+            transform: scale(1.1);
+        }
+        
+        .comment-form {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid #e5e7eb;
+            padding: 16px;
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+        }
+        
+        .comment-form.show {
+            transform: translateY(0);
+        }
+        
+        .floating-actions {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            z-index: 1000;
+        }
+        
+        .floating-btn {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .floating-btn:hover {
+            transform: scale(1.1);
+        }
+        
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .modal-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .modal-image {
+            max-width: 90%;
+            max-height: 90%;
+            border-radius: 12px;
+            transform: scale(0.8);
+            transition: transform 0.3s ease;
+        }
+        
+        .modal-overlay.show .modal-image {
+            transform: scale(1);
+        }
+        
+        .farmer-info {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            margin: 20px 20px 24px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            position: relative;
+            z-index: 10;
+        }
+        
+        .progress-bar {
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 8px 0;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #16a34a, #059669);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- iOS状态栏 -->
+    <div class="status-bar">
+        <div class="status-left">
+            <span>9:41</span>
+        </div>
+        <div class="status-right">
+            <i class="fas fa-signal text-sm"></i>
+            <i class="fas fa-wifi text-sm"></i>
+            <div class="battery">
+                <div class="battery-level"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 头部图片区域 -->
+    <div class="hero-image">
+        <button onclick="goBack()" class="absolute top-6 left-6 w-10 h-10 bg-black bg-opacity-30 rounded-full flex items-center justify-center text-white">
+            <i class="fas fa-arrow-left"></i>
+        </button>
+        <button onclick="showShareModal()" class="absolute top-6 right-6 w-10 h-10 bg-black bg-opacity-30 rounded-full flex items-center justify-center text-white">
+            <i class="fas fa-share"></i>
+        </button>
+        
+        <div class="w-full">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-2xl font-bold mb-2">张大爷的优质水稻</h1>
+                    <div class="flex items-center gap-4 text-sm">
+                        <span><i class="fas fa-map-marker-alt mr-1"></i>江苏省扬州市</span>
+                        <span><i class="fas fa-calendar mr-1"></i>第89天</span>
+                    </div>
+                </div>
+                <div class="text-center">
+                    <div class="text-2xl font-bold">1.2k</div>
+                    <div class="text-xs">关注数</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 农户信息卡片 -->
+    <div class="farmer-info">
+        <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center">
+                <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mr-3">
+                    <i class="fas fa-user text-green-600 text-xl"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-gray-800">张大爷</h3>
+                    <p class="text-sm text-gray-600">认证农户 · 种植经验15年</p>
+                </div>
+            </div>
+            <button class="bg-green-600 text-white px-6 py-2 rounded-full text-sm font-medium min-w-[80px]" onclick="followFarmer()">
+                关注
+            </button>
+        </div>
+        
+        <!-- 生长进度 -->
+        <div class="mb-4">
+            <div class="flex justify-between text-sm mb-2">
+                <span class="text-gray-600">生长进度</span>
+                <span class="text-green-600 font-medium">59%</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" style="width: 59%"></div>
+            </div>
+            <div class="flex justify-between text-xs text-gray-500 mt-1">
+                <span>播种</span>
+                <span>收获预计还需62天</span>
+            </div>
+        </div>
+        
+        <!-- 统计信息 -->
+        <div class="grid grid-cols-3 gap-4 text-center">
+            <div>
+                <div class="text-lg font-bold text-gray-800">12</div>
+                <div class="text-xs text-gray-600">生长记录</div>
+            </div>
+            <div>
+                <div class="text-lg font-bold text-gray-800">89</div>
+                <div class="text-xs text-gray-600">种植天数</div>
+            </div>
+            <div>
+                <div class="text-lg font-bold text-gray-800">0</div>
+                <div class="text-xs text-gray-600">农药使用</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 主内容区域 -->
+    <div class="px-6">
+        <!-- 查看模式切换 -->
+        <div class="flex items-center justify-between mb-6">
+            <h3 class="text-xl font-bold text-gray-800">生长轨迹</h3>
+            <div class="flex gap-2">
+                <button id="timelineBtn" class="px-6 py-2 bg-green-600 text-white rounded-full text-sm whitespace-nowrap" onclick="showTimeline()">
+                    时间线
+                </button>
+                <button id="calendarBtn" class="px-6 py-2 bg-gray-200 text-gray-600 rounded-full text-sm whitespace-nowrap" onclick="showCalendar()">
+                    按日查看
+                </button>
+            </div>
+        </div>
+
+        <!-- 按日查看视图 -->
+        <div id="calendarView" class="hidden">
+            <div class="day-selector">
+                <div class="flex items-center justify-between">
+                    <h4 class="font-semibold text-gray-800">2024年7月</h4>
+                    <div class="flex gap-2">
+                        <button class="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-600">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <button class="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-600">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="day-grid">
+                    <div class="day-item">日</div>
+                    <div class="day-item">一</div>
+                    <div class="day-item">二</div>
+                    <div class="day-item">三</div>
+                    <div class="day-item">四</div>
+                    <div class="day-item">五</div>
+                    <div class="day-item">六</div>
+                    <div class="day-item"></div>
+                    <div class="day-item has-record" onclick="jumpToDay(1)">1</div>
+                    <div class="day-item">2</div>
+                    <div class="day-item">3</div>
+                    <div class="day-item has-record" onclick="jumpToDay(5)">5</div>
+                    <div class="day-item">6</div>
+                    <div class="day-item">7</div>
+                    <div class="day-item">8</div>
+                    <div class="day-item">9</div>
+                    <div class="day-item has-record" onclick="jumpToDay(12)">12</div>
+                    <div class="day-item">13</div>
+                    <div class="day-item">14</div>
+                    <div class="day-item has-record" onclick="jumpToDay(16)">16</div>
+                    <div class="day-item">17</div>
+                    <div class="day-item">18</div>
+                    <div class="day-item has-record" onclick="jumpToDay(19)">19</div>
+                    <div class="day-item">20</div>
+                    <div class="day-item has-record" onclick="jumpToDay(21)">21</div>
+                    <div class="day-item today" onclick="jumpToDay(22)">22</div>
+                    <div class="day-item">23</div>
+                    <div class="day-item">24</div>
+                    <div class="day-item">25</div>
+                    <div class="day-item">26</div>
+                    <div class="day-item">27</div>
+                    <div class="day-item">28</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 时间线视图 -->
+        <div id="timelineView" class="timeline-vertical pb-24">
+            <!-- 今天的记录 -->
+            <div class="timeline-item-vertical today">
+                <img src="https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=400&h=200&fit=crop" 
+                     alt="今日水稻" class="crop-image-detail" onclick="showImageModal(this.src.replace('w=400&h=200', 'w=800&h=600'))">
+                <div class="p-6">
+                    <div class="flex items-center justify-between mb-3">
+                        <div>
+                            <span class="text-lg font-bold text-gray-800">7月22日</span>
+                            <span class="text-sm text-gray-500 ml-2">星期一 · 今天</span>
+                        </div>
+                        <span class="bg-green-100 text-green-600 px-2 py-1 rounded text-xs font-medium">最新</span>
+                    </div>
+                    <p class="text-gray-700 mb-4 leading-relaxed">水稻长势很好，叶子绿油油的。今天浇了水，施了肥。天气晴朗，非常适合水稻生长。</p>
+                    <div class="flex flex-wrap gap-2 mb-4">
+                        <span class="tag">浇水</span>
+                        <span class="tag">施肥</span>
+                        <span class="tag">生长记录</span>
+                    </div>
+                    <div class="flex items-center justify-between text-sm text-gray-500">
+                        <span><i class="fas fa-clock mr-1"></i>上午 9:30</span>
+                        <span><i class="fas fa-thermometer-half mr-1"></i>28°C</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 昨天的记录 -->
+            <div class="timeline-item-vertical">
+                <img src="https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=400&h=200&fit=crop" 
+                     alt="除草作业" class="crop-image-detail" onclick="showImageModal(this.src.replace('w=400&h=200', 'w=800&h=600'))">
+                <div class="p-6">
+                    <div class="flex items-center justify-between mb-3">
+                        <div>
+                            <span class="text-lg font-bold text-gray-800">7月21日</span>
+                            <span class="text-sm text-gray-500 ml-2">星期日 · 昨天</span>
+                        </div>
+                    </div>
+                    <p class="text-gray-700 mb-4 leading-relaxed">今天把田里的杂草都清理干净了，水稻可以更好地吸收养分了。除草工作比较辛苦，但是为了水稻的健康成长，值得。</p>
+                    <div class="flex flex-wrap gap-2 mb-4">
+                        <span class="tag">除草</span>
+                    </div>
+                    <div class="flex items-center justify-between text-sm text-gray-500">
+                        <span><i class="fas fa-clock mr-1"></i>下午 4:20</span>
+                        <span><i class="fas fa-thermometer-half mr-1"></i>31°C</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3天前的记录 -->
+            <div class="timeline-item-vertical">
+                <img src="https://images.unsplash.com/photo-1586771107445-d3ca888129ff?w=400&h=200&fit=crop" 
+                     alt="抽穗期" class="crop-image-detail" onclick="showImageModal(this.src.replace('w=400&h=200', 'w=800&h=600'))">
+                <div class="p-6">
+                    <div class="flex items-center justify-between mb-3">
+                        <div>
+                            <span class="text-lg font-bold text-gray-800">7月19日</span>
+                            <span class="text-sm text-gray-500 ml-2">星期五 · 3天前</span>
+                        </div>
+                        <span class="bg-blue-100 text-blue-600 px-2 py-1 rounded text-xs font-medium">重要时刻</span>
+                    </div>
+                    <p class="text-gray-700 mb-4 leading-relaxed">水稻抽穗了！这是水稻生长的重要阶段，意味着即将进入成熟期。今年的收成应该不错，穗子很饱满。</p>
+                    <div class="flex flex-wrap gap-2 mb-4">
+                        <span class="tag">生长记录</span>
+                        <span class="tag">抽穗期</span>
+                    </div>
+                    <div class="flex items-center justify-between text-sm text-gray-500">
+                        <span><i class="fas fa-clock mr-1"></i>上午 8:15</span>
+                        <span><i class="fas fa-thermometer-half mr-1"></i>26°C</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 播种记录 -->
+            <div class="timeline-item-vertical">
+                <img src="https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&h=200&fit=crop" 
+                     alt="播种开始" class="crop-image-detail" onclick="showImageModal(this.src.replace('w=400&h=200', 'w=800&h=600'))">
+                <div class="p-6">
+                    <div class="flex items-center justify-between mb-3">
+                        <div>
+                            <span class="text-lg font-bold text-gray-800">4月24日</span>
+                            <span class="text-sm text-gray-500 ml-2">播种日 · 89天前</span>
+                        </div>
+                        <span class="bg-red-100 text-red-600 px-2 py-1 rounded text-xs font-medium">起始点</span>
+                    </div>
+                    <p class="text-gray-700 mb-4 leading-relaxed">今天开始播种水稻，希望今年有个好收成！选用的是优质的种子，经过精心挑选。天气条件很好，适合播种。</p>
+                    <div class="flex flex-wrap gap-2 mb-4">
+                        <span class="tag bg-red-100 text-red-600">播种</span>
+                        <span class="tag">新开始</span>
+                    </div>
+                    <div class="flex items-center justify-between text-sm text-gray-500">
+                        <span><i class="fas fa-clock mr-1"></i>上午 6:30</span>
+                        <span><i class="fas fa-thermometer-half mr-1"></i>18°C</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 加载更多提示 -->
+            <div class="text-center py-8">
+                <button class="text-green-600 font-medium" onclick="loadMoreRecords()">
+                    <i class="fas fa-chevron-up mr-2"></i>
+                    查看更早的记录
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 悬浮操作按钮 -->
+    <div class="floating-actions">
+        <div class="floating-btn bg-blue-500" onclick="showCommentForm()" title="匿名留言">
+            <i class="fas fa-comment"></i>
+        </div>
+        <div class="floating-btn bg-red-500" onclick="likeCrop()" title="点赞">
+            <i class="fas fa-heart"></i>
+        </div>
+        <div class="floating-btn bg-green-500" onclick="followFarmer()" title="关注农户">
+            <i class="fas fa-user-plus"></i>
+        </div>
+    </div>
+
+    <!-- 匿名留言表单 -->
+    <div class="comment-form" id="commentForm">
+        <div class="flex items-center mb-3">
+            <h4 class="font-bold text-gray-800">匿名留言</h4>
+            <span class="text-xs text-gray-500 ml-2">无需注册</span>
+            <button class="ml-auto text-gray-400" onclick="hideCommentForm()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="flex gap-3">
+            <input type="text" 
+                   class="flex-1 p-3 border border-gray-300 rounded-lg" 
+                   placeholder="想问农户什么问题？比如：这个水稻用了什么肥料？"
+                   id="commentInput">
+            <button class="bg-green-600 text-white px-6 py-3 rounded-lg font-medium" onclick="submitComment()">
+                发送
+            </button>
+        </div>
+        <p class="text-xs text-gray-500 mt-2">您的留言将匿名发送给农户，农户会尽快回复</p>
+    </div>
+
+    <!-- 图片查看模态框 -->
+    <div class="modal-overlay" id="imageModal" onclick="hideImageModal()">
+        <img class="modal-image" id="modalImage" alt="高清图片">
+        <button class="absolute top-6 right-6 w-10 h-10 bg-black bg-opacity-50 rounded-full flex items-center justify-center text-white">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+
+    <script>
+        // 显示时间线视图
+        function showTimeline() {
+            document.getElementById('timelineView').classList.remove('hidden');
+            document.getElementById('calendarView').classList.add('hidden');
+            document.getElementById('timelineBtn').classList.add('bg-green-600', 'text-white');
+            document.getElementById('timelineBtn').classList.remove('bg-gray-200', 'text-gray-600');
+            document.getElementById('calendarBtn').classList.remove('bg-green-600', 'text-white');
+            document.getElementById('calendarBtn').classList.add('bg-gray-200', 'text-gray-600');
+        }
+
+        // 显示日历视图
+        function showCalendar() {
+            document.getElementById('calendarView').classList.remove('hidden');
+            document.getElementById('timelineView').classList.add('hidden');
+            document.getElementById('calendarBtn').classList.add('bg-green-600', 'text-white');
+            document.getElementById('calendarBtn').classList.remove('bg-gray-200', 'text-gray-600');
+            document.getElementById('timelineBtn').classList.remove('bg-green-600', 'text-white');
+            document.getElementById('timelineBtn').classList.add('bg-gray-200', 'text-gray-600');
+        }
+
+        // 跳转到特定日期
+        function jumpToDay(day) {
+            showTimeline();
+            // 实际应用中这里会滚动到对应日期的记录
+            alert(`跳转到7月${day}日的记录`);
+        }
+
+        // 显示图片模态框
+        function showImageModal(src) {
+            document.getElementById('modalImage').src = src;
+            document.getElementById('imageModal').classList.add('show');
+        }
+
+        // 隐藏图片模态框
+        function hideImageModal() {
+            document.getElementById('imageModal').classList.remove('show');
+        }
+
+        // 显示留言表单
+        function showCommentForm() {
+            document.getElementById('commentForm').classList.add('show');
+            document.getElementById('commentInput').focus();
+        }
+
+        // 隐藏留言表单
+        function hideCommentForm() {
+            document.getElementById('commentForm').classList.remove('show');
+        }
+
+        // 提交留言
+        function submitComment() {
+            const input = document.getElementById('commentInput');
+            const content = input.value.trim();
+            
+            if (!content) {
+                alert('请输入留言内容');
+                return;
+            }
+            
+            // 模拟发送留言
+            alert('留言已发送给农户，他们会尽快回复您！');
+            input.value = '';
+            hideCommentForm();
+        }
+
+        // 点赞作物
+        function likeCrop() {
+            alert('已点赞！注册后可以收到收获提醒');
+        }
+
+        // 关注农户
+        function followFarmer() {
+            alert('关注成功！注册后可以收到农户的最新动态');
+        }
+
+        // 显示分享模态框
+        function showShareModal() {
+            alert('分享功能：可以生成带二维码的海报，分享给朋友查看');
+        }
+
+        // 加载更多记录
+        function loadMoreRecords() {
+            alert('正在加载更早的记录...');
+        }
+
+        // 返回上一页
+        function goBack() {
+            history.back();
+        }
+
+        // 页面加载完成
+        document.addEventListener('DOMContentLoaded', function() {
+            // 模拟网络检测和图片优化
+            function optimizeImages() {
+                if (navigator.connection && navigator.connection.effectiveType === '2g') {
+                    const images = document.querySelectorAll('.crop-image-detail');
+                    images.forEach(img => {
+                        const src = img.src;
+                        img.src = src.replace('w=400&h=200', 'w=200&h=100&q=50');
+                        img.setAttribute('data-hd-src', src.replace('w=400&h=200', 'w=800&h=600'));
+                    });
+                }
+            }
+
+            optimizeImages();
+
+            // 图片点击加载高清版本
+            document.querySelectorAll('.crop-image-detail').forEach(img => {
+                img.addEventListener('click', function() {
+                    const hdSrc = this.getAttribute('data-hd-src');
+                    if (hdSrc) {
+                        showImageModal(hdSrc);
+                    }
+                });
+            });
+
+            // 滚动加载更多（向上滑动）
+            let isLoading = false;
+            window.addEventListener('scroll', function() {
+                if (window.scrollY === 0 && !isLoading) {
+                    isLoading = true;
+                    console.log('加载更早的记录...');
+                    // 这里可以加载更多历史记录
+                    setTimeout(() => {
+                        isLoading = false;
+                    }, 2000);
+                }
+            });
+        });
+
+        // 防止模态框内部点击关闭
+        document.getElementById('modalImage').addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
+
+        // 留言输入框回车发送
+        document.getElementById('commentInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                submitComment();
+            }
+        });
+    </script>
+</body>
+</html>

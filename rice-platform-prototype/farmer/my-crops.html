@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的作物 - 智慧农业溯源</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="../assets/styles.css" rel="stylesheet">
+</head>
+<body class="bg-green-50">
+    <!-- iOS状态栏 -->
+    <div class="status-bar">
+        <div class="status-left">
+            <span>9:41</span>
+        </div>
+        <div class="status-right">
+            <i class="fas fa-signal text-sm"></i>
+            <i class="fas fa-wifi text-sm"></i>
+            <div class="battery">
+                <div class="battery-level"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 顶部导航栏 -->
+    <div class="top-nav">
+        <div class="flex items-center">
+            <i class="fas fa-seedling text-2xl mr-3"></i>
+            <span class="header-elderly">我的作物生长记录</span>
+        </div>
+        <button class="text-white text-xl" onclick="showMenu()">
+            <i class="fas fa-ellipsis-v"></i>
+        </button>
+    </div>
+
+    <!-- 作物概览卡片 -->
+    <div class="p-6">
+        <div class="card bg-gradient-to-r from-green-400 to-green-600 text-white">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h2 class="text-white text-2xl font-bold mb-2">我的水稻田</h2>
+                    <p class="text-green-100 text-lg">种植第 89 天</p>
+                    <p class="text-green-100">已发布 12 条生长记录</p>
+                </div>
+                <div class="w-20 h-20 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                    <i class="fas fa-leaf text-3xl"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 时间线内容区域 -->
+    <div class="px-6 pb-24">
+        <div class="flex items-center justify-between mb-6">
+            <h3 class="title-elderly text-green-800 flex items-center">生长记录时间线</h3>
+            <button id="sortButton" class="px-3 py-2 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-full text-sm font-bold shadow-md hover:from-green-600 hover:to-green-700 transition-all duration-200" onclick="toggleSort()" style="font-family: 'Helvetica Neue', -apple-system, sans-serif; font-weight: 700;">
+                <i class="fas fa-sort-amount-down mr-1 text-xs"></i>
+                <span id="sortText">升序查看</span>
+            </button>
+        </div>
+
+        <!-- 时间线项目 -->
+        <div class="timeline">
+            <!-- 今天的记录 -->
+            <div class="timeline-item">
+                <div class="timeline-date">
+                    7月22日<br>
+                    <span class="text-sm">星期一</span>
+                </div>
+                <div class="timeline-content">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-lg font-semibold text-green-800">生长记录</span>
+                        <span class="text-sm text-gray-500">今天 09:30</span>
+                    </div>
+                    <img src="https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=400&h=200&fit=crop" 
+                         alt="水稻生长照片" class="timeline-image">
+                    <p class="text-elderly text-gray-700">水稻长势很好，叶子绿油油的。今天浇了水，施了肥。</p>
+                    <div class="tag-group mt-3">
+                        <span class="tag">浇水</span>
+                        <span class="tag">施肥</span>
+                        <span class="tag">生长记录</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 昨天的记录 -->
+            <div class="timeline-item">
+                <div class="timeline-date">
+                    7月21日<br>
+                    <span class="text-sm">星期日</span>
+                </div>
+                <div class="timeline-content">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-lg font-semibold text-green-800">除草</span>
+                        <span class="text-sm text-gray-500">昨天 16:20</span>
+                    </div>
+                    <img src="https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=400&h=200&fit=crop" 
+                         alt="除草照片" class="timeline-image">
+                    <p class="text-elderly text-gray-700">今天把田里的杂草都清理干净了，水稻可以更好地吸收养分了。</p>
+                    <div class="tag-group mt-3">
+                        <span class="tag">除草</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3天前的记录 -->
+            <div class="timeline-item">
+                <div class="timeline-date">
+                    7月19日<br>
+                    <span class="text-sm">星期五</span>
+                </div>
+                <div class="timeline-content">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-lg font-semibold text-green-800">生长记录</span>
+                        <span class="text-sm text-gray-500">3天前 08:15</span>
+                    </div>
+                    <img src="https://images.unsplash.com/photo-1586771107445-d3ca888129ff?w=400&h=200&fit=crop" 
+                         alt="水稻生长照片" class="timeline-image">
+                    <p class="text-elderly text-gray-700">水稻抽穗了！今年的收成应该不错。</p>
+                    <div class="tag-group mt-3">
+                        <span class="tag">生长记录</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 播种记录 -->
+            <div class="timeline-item">
+                <div class="timeline-date bg-red-100 text-red-600">
+                    4月24日<br>
+                    <span class="text-sm">播种日</span>
+                </div>
+                <div class="timeline-content">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-lg font-semibold text-red-600">播种开始</span>
+                        <span class="text-sm text-gray-500">89天前</span>
+                    </div>
+                    <img src="https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&h=200&fit=crop" 
+                         alt="播种照片" class="timeline-image">
+                    <p class="text-elderly text-gray-700">今天开始播种水稻，希望今年有个好收成！</p>
+                    <div class="tag-group mt-3">
+                        <span class="tag bg-red-100 text-red-600">播种</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 加载更多 -->
+        <div class="text-center mt-8">
+            <button class="btn-secondary" onclick="loadMore()">
+                <i class="fas fa-chevron-down mr-2"></i>
+                查看更早的记录
+            </button>
+        </div>
+    </div>
+
+    <!-- 底部操作栏 -->
+    <div class="fixed bottom-20 left-1/2 transform -translate-x-1/2 bg-white rounded-full shadow-lg p-2 flex gap-4">
+        <button class="w-14 h-14 bg-red-500 text-white rounded-full flex items-center justify-center" onclick="deleteRecord()">
+            <i class="fas fa-trash text-lg"></i>
+        </button>
+        <button class="w-14 h-14 bg-blue-500 text-white rounded-full flex items-center justify-center" onclick="editRecord()">
+            <i class="fas fa-edit text-lg"></i>
+        </button>
+    </div>
+
+    <!-- 底部导航栏 -->
+    <div class="bottom-nav">
+        <div class="nav-item active">
+            <i class="nav-icon fas fa-leaf"></i>
+            <span>我的作物</span>
+        </div>
+        <div class="nav-item" onclick="goToPublish()">
+            <i class="nav-icon fas fa-plus"></i>
+            <span>发布</span>
+        </div>
+        <div class="nav-item" onclick="goToMessages()">
+            <i class="nav-icon fas fa-comments"></i>
+            <span>消息</span>
+            <div class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">3</div>
+        </div>
+    </div>
+
+    <!-- 语音提示区域 -->
+    <div class="fixed top-20 left-4 right-4 z-50 hidden" id="voiceHint">
+        <div class="bg-blue-100 border border-blue-300 rounded-lg p-4 flex items-center">
+            <i class="fas fa-volume-up text-blue-600 text-xl mr-3"></i>
+            <p class="text-blue-800 text-lg font-medium" id="hintText"></p>
+        </div>
+    </div>
+
+    <!-- 菜单弹窗 -->
+    <div class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center" id="menuModal">
+        <div class="bg-white rounded-xl p-6 mx-6 w-full max-w-sm">
+            <h3 class="title-elderly text-center mb-6">更多操作</h3>
+            <div class="space-y-4">
+                <button class="btn-large btn-secondary w-full" onclick="exportData()">
+                    <i class="fas fa-download mr-2"></i>
+                    导出记录
+                </button>
+                <button class="btn-large btn-secondary w-full" onclick="shareTimeline()">
+                    <i class="fas fa-share mr-2"></i>
+                    分享时间线
+                </button>
+                <button class="btn-large btn-secondary w-full" onclick="settings()">
+                    <i class="fas fa-cog mr-2"></i>
+                    设置
+                </button>
+                <button class="btn-large btn-primary w-full" onclick="closeMenu()">
+                    返回
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 显示语音提示
+        function showVoiceHint(text) {
+            document.getElementById('hintText').textContent = text;
+            const hintEl = document.getElementById('voiceHint');
+            hintEl.classList.remove('hidden');
+            
+            // 语音播报
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'zh-CN';
+                utterance.rate = 0.8;
+                speechSynthesis.speak(utterance);
+            }
+            
+            // 3秒后自动隐藏
+            setTimeout(() => {
+                hintEl.classList.add('hidden');
+            }, 3000);
+        }
+
+        // 显示菜单
+        function showMenu() {
+            document.getElementById('menuModal').classList.remove('hidden');
+            document.getElementById('menuModal').classList.add('flex');
+        }
+
+        // 关闭菜单
+        function closeMenu() {
+            document.getElementById('menuModal').classList.add('hidden');
+            document.getElementById('menuModal').classList.remove('flex');
+        }
+
+        // 删除记录
+        function deleteRecord() {
+            if (confirm('确定要删除这条记录吗？')) {
+                showVoiceHint('记录已删除');
+            }
+        }
+
+        // 编辑记录
+        function editRecord() {
+            showVoiceHint('正在打开编辑页面');
+        }
+
+        // 加载更多
+        function loadMore() {
+            showVoiceHint('正在加载更早的记录');
+            // 模拟加载
+            setTimeout(() => {
+                showVoiceHint('已加载完所有记录');
+            }, 2000);
+        }
+
+        // 导航功能
+        function goToPublish() {
+            showVoiceHint('正在打开发布页面');
+        }
+
+        function goToMessages() {
+            showVoiceHint('正在打开消息中心');
+        }
+
+        // 菜单功能
+        function exportData() {
+            closeMenu();
+            showVoiceHint('正在准备导出文件');
+        }
+
+        function shareTimeline() {
+            closeMenu();
+            showVoiceHint('正在生成分享链接');
+        }
+
+        function settings() {
+            closeMenu();
+            showVoiceHint('正在打开设置页面');
+        }
+
+        // 排序状态
+        let isAscending = true;
+        
+        // 切换排序
+        function toggleSort() {
+            isAscending = !isAscending;
+            const sortButton = document.getElementById('sortButton');
+            const sortText = document.getElementById('sortText');
+            const sortIcon = sortButton.querySelector('i');
+            
+            if (isAscending) {
+                sortText.textContent = '升序查看';
+                sortIcon.className = 'fas fa-sort-amount-down mr-2';
+                showVoiceHint('已切换为升序排列');
+            } else {
+                sortText.textContent = '倒序查看';
+                sortIcon.className = 'fas fa-sort-amount-up mr-2';
+                showVoiceHint('已切换为倒序排列');
+            }
+            
+            // 重新排序时间线
+            sortTimeline();
+        }
+        
+        // 排序时间线
+        function sortTimeline() {
+            const timeline = document.querySelector('.timeline');
+            const items = Array.from(timeline.querySelectorAll('.timeline-item'));
+            
+            items.sort((a, b) => {
+                const dateA = a.querySelector('.timeline-date').textContent.trim();
+                const dateB = b.querySelector('.timeline-date').textContent.trim();
+                
+                // 简单的日期比较（基于月日）
+                const getDateValue = (dateStr) => {
+                    const match = dateStr.match(/(\d+)月(\d+)日/);
+                    if (match) {
+                        return parseInt(match[1]) * 100 + parseInt(match[2]);
+                    }
+                    return 0;
+                };
+                
+                const valueA = getDateValue(dateA);
+                const valueB = getDateValue(dateB);
+                
+                return isAscending ? valueA - valueB : valueB - valueA;
+            });
+            
+            // 重新插入排序后的元素
+            items.forEach(item => timeline.appendChild(item));
+        }
+
+        // 页面加载完成
+        document.addEventListener('DOMContentLoaded', function() {
+            showVoiceHint('您的作物生长记录已加载完成');
+        });
+
+        // 下拉刷新
+        let startY = 0;
+        let currentY = 0;
+        let isDragging = false;
+
+        document.addEventListener('touchstart', function(e) {
+            startY = e.touches[0].clientY;
+            isDragging = true;
+        });
+
+        document.addEventListener('touchmove', function(e) {
+            if (!isDragging) return;
+            currentY = e.touches[0].clientY;
+            const diff = currentY - startY;
+            
+            if (diff > 100 && window.scrollY === 0) {
+                showVoiceHint('正在刷新页面');
+            }
+        });
+
+        document.addEventListener('touchend', function() {
+            isDragging = false;
+        });
+    </script>
+</body>
+</html>

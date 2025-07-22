@@ -1,0 +1,59 @@
+/* 智慧农业溯源APP - 基础样式 */
+
+/* 全局基础样式 */
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', sans-serif;
+    font-size: var(--text-base);
+    line-height: 1.6;
+    color: var(--text-dark);
+    margin: 0;
+    padding: 0;
+    background: var(--background-soft);
+}
+
+/* 辅助工具类 */
+.text-center { text-align: center; }
+.text-left { text-align: left; }
+.text-right { text-align: right; }
+
+.mb-small { margin-bottom: 8px; }
+.mb-medium { margin-bottom: 16px; }
+.mb-large { margin-bottom: 24px; }
+
+.p-small { padding: 8px; }
+.p-medium { padding: 16px; }
+.p-large { padding: 24px; }
+
+.rounded { border-radius: var(--border-radius); }
+.shadow { box-shadow: var(--shadow-soft); }
+
+/* 可访问性支持 */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* 响应式设计 */
+@media (max-width: 480px) {
+    .phone-container {
+        width: 100%;
+        height: 100vh;
+        border-radius: 0;
+        padding: 0;
+    }
+    
+    .phone-screen {
+        border-radius: 0;
+    }
+}

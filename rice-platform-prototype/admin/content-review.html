@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>内容审核 - 智慧农业溯源管理后台</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="../assets/styles.css" rel="stylesheet">
+    <style>
+        .admin-layout {
+            background: #f8fafc;
+            min-height: 100vh;
+        }
+        
+        .admin-header {
+            background: linear-gradient(135deg, #1e293b, #334155);
+            color: white;
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .admin-nav {
+            background: white;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 0 24px;
+            display: flex;
+            align-items: center;
+            gap: 32px;
+            overflow-x: auto;
+        }
+        
+        .nav-item {
+            padding: 16px 0;
+            border-bottom: 2px solid transparent;
+            color: #64748b;
+            text-decoration: none;
+            white-space: nowrap;
+            transition: all 0.2s ease;
+        }
+        
+        .nav-item.active {
+            color: #7c3aed;
+            border-bottom-color: #7c3aed;
+        }
+        
+        .content-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            margin-bottom: 24px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .content-card:hover {
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+        }
+        
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .status-approved {
+            background: #dcfce7;
+            color: #16a34a;
+        }
+        
+        .status-pending {
+            background: #fef3c7;
+            color: #d97706;
+        }
+        
+        .status-rejected {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+        
+        .status-flagged {
+            background: #fce7f3;
+            color: #be185d;
+        }
+        
+        .action-btn {
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+            margin-right: 8px;
+        }
+        
+        .btn-approve {
+            background: #10b981;
+            color: white;
+        }
+        
+        .btn-approve:hover {
+            background: #059669;
+        }
+        
+        .btn-reject {
+            background: #ef4444;
+            color: white;
+        }
+        
+        .btn-reject:hover {
+            background: #dc2626;
+        }
+        
+        .btn-edit {
+            background: #3b82f6;
+            color: white;
+        }
+        
+        .btn-edit:hover {
+            background: #2563eb;
+        }
+        
+        .btn-contact {
+            background: #f59e0b;
+            color: white;
+        }
+        
+        .btn-contact:hover {
+            background: #d97706;
+        }
+        
+        .filter-bar {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            text-align: center;
+        }
+        
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+            font-size: 24px;
+        }
+        
+        .content-image {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-right: 16px;
+        }
+        
+        .log-entry {
+            background: #f8fafc;
+            border-left: 4px solid #e2e8f0;
+            padding: 12px 16px;
+            margin-bottom: 12px;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .log-entry.action-approve {
+            border-left-color: #10b981;
+            background: #f0fdf4;
+        }
+        
+        .log-entry.action-reject {
+            border-left-color: #ef4444;
+            background: #fef2f2;
+        }
+        
+        .log-entry.action-edit {
+            border-left-color: #3b82f6;
+            background: #eff6ff;
+        }
+        
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .modal-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+        
+        .modal-overlay.show .modal-content {
+            transform: scale(1);
+        }
+    </style>
+</head>
+<body class="admin-layout">
+    <!-- iOS状态栏 -->
+    <div class="status-bar">
+        <div class="status-left">
+            <span>9:41</span>
+        </div>
+        <div class="status-right">
+            <i class="fas fa-signal text-sm"></i>
+            <i class="fas fa-wifi text-sm"></i>
+            <div class="battery">
+                <div class="battery-level"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 管理员头部 -->
+    <div class="admin-header">
+        <div class="flex items-center">
+            <button onclick="goBack()" class="text-white text-xl mr-4">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            <h1 class="text-xl font-bold">智慧农业溯源管理后台</h1>
+        </div>
+        <div class="flex items-center gap-4">
+            <span class="text-sm">管理员：张管理员</span>
+            <button class="text-white hover:text-gray-300" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- 导航栏 -->
+    <div class="admin-nav">
+        <a href="#" class="nav-item active">
+            <i class="fas fa-clipboard-check mr-2"></i>
+            内容审核
+        </a>
+        <a href="#" class="nav-item" onclick="switchTab('users')">
+            <i class="fas fa-users mr-2"></i>
+            用户管理
+        </a>
+        <a href="#" class="nav-item" onclick="switchTab('analytics')">
+            <i class="fas fa-chart-bar mr-2"></i>
+            数据统计
+        </a>
+        <a href="#" class="nav-item">
+            <i class="fas fa-cog mr-2"></i>
+            系统设置
+        </a>
+    </div>
+
+    <!-- 主内容区域 -->
+    <div class="p-6">
+        <!-- 统计卡片 -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon bg-green-100 text-green-600">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-gray-800 mb-2">1,234</h3>
+                <p class="text-gray-600">今日自动通过</p>
+                <p class="text-sm text-green-600 mt-1">+12% 较昨日</p>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon bg-yellow-100 text-yellow-600">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-gray-800 mb-2">23</h3>
+                <p class="text-gray-600">待人工审核</p>
+                <p class="text-sm text-yellow-600 mt-1">需要处理</p>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon bg-red-100 text-red-600">
+                    <i class="fas fa-flag"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-gray-800 mb-2">5</h3>
+                <p class="text-gray-600">被举报内容</p>
+                <p class="text-sm text-red-600 mt-1">优先处理</p>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon bg-blue-100 text-blue-600">
+                    <i class="fas fa-phone"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-gray-800 mb-2">12</h3>
+                <p class="text-gray-600">电话支持次数</p>
+                <p class="text-sm text-blue-600 mt-1">今日提供帮助</p>
+            </div>
+        </div>
+
+        <!-- 筛选栏 -->
+        <div class="filter-bar">
+            <div class="flex flex-wrap items-center gap-4">
+                <div class="flex items-center gap-2">
+                    <label class="text-sm font-medium text-gray-700">状态筛选：</label>
+                    <select class="border border-gray-300 rounded-lg px-3 py-2 text-sm" onchange="filterContent(this.value)">
+                        <option value="all">全部</option>
+                        <option value="pending">待审核</option>
+                        <option value="flagged">被举报</option>
+                        <option value="approved">已通过</option>
+                        <option value="rejected">已拒绝</option>
+                    </select>
+                </div>
+                
+                <div class="flex items-center gap-2">
+                    <label class="text-sm font-medium text-gray-700">农户：</label>
+                    <input type="text" 
+                           class="border border-gray-300 rounded-lg px-3 py-2 text-sm w-48" 
+                           placeholder="搜索农户姓名或ID"
+                           onchange="searchFarmer(this.value)">
+                </div>
+                
+                <div class="flex items-center gap-2">
+                    <label class="text-sm font-medium text-gray-700">日期：</label>
+                    <input type="date" 
+                           class="border border-gray-300 rounded-lg px-3 py-2 text-sm"
+                           onchange="filterByDate(this.value)">
+                </div>
+                
+                <button class="action-btn btn-approve" onclick="batchApprove()">
+                    <i class="fas fa-check mr-2"></i>
+                    批量通过
+                </button>
+            </div>
+        </div>
+
+        <!-- 内容列表 -->
+        <div id="contentList">
+            <!-- 被举报的内容 - 优先处理 -->
+            <div class="content-card">
+                <div class="p-6">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="flex items-center gap-3">
+                            <span class="status-badge status-flagged">被举报</span>
+                            <span class="text-sm text-gray-500">ID: #12847</span>
+                            <span class="text-sm text-red-600 font-medium">
+                                <i class="fas fa-exclamation-triangle mr-1"></i>
+                                优先处理
+                            </span>
+                        </div>
+                        <span class="text-sm text-gray-500">2小时前</span>
+                    </div>
+                    
+                    <div class="flex mb-4">
+                        <img src="https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=100&h=100&fit=crop" 
+                             alt="农作物照片" class="content-image">
+                        <div class="flex-1">
+                            <div class="flex items-center mb-2">
+                                <h4 class="font-bold text-gray-800 mr-3">王大叔的玉米田</h4>
+                                <span class="text-sm text-gray-600">江苏省 · 王大叔</span>
+                            </div>
+                            <p class="text-gray-700 mb-2">
+                                今天玉米长得特别好，用的都是最好的肥料。保证绝对安全无害，大家放心购买。
+                            </p>
+                            <div class="flex items-center text-sm text-gray-500">
+                                <span class="mr-4">
+                                    <i class="fas fa-flag mr-1"></i>
+                                    举报原因：虚假宣传
+                                </span>
+                                <span>举报人：匿名买家</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gray-50 p-4 rounded-lg mb-4">
+                        <h5 class="font-medium text-gray-800 mb-2">举报详情</h5>
+                        <p class="text-sm text-gray-600">
+                            用户举报该内容存在"绝对安全无害"等绝对化表述，可能误导消费者。
+                            建议修改为更客观的描述。
+                        </p>
+                    </div>
+                    
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <button class="action-btn btn-reject" onclick="handleViolation(12847)">
+                                <i class="fas fa-eye-slash mr-1"></i>
+                                隐藏内容
+                            </button>
+                            <button class="action-btn btn-edit" onclick="editContent(12847)">
+                                <i class="fas fa-edit mr-1"></i>
+                                帮助修改
+                            </button>
+                            <button class="action-btn btn-contact" onclick="contactFarmer('王大叔', '13888888888')">
+                                <i class="fas fa-phone mr-1"></i>
+                                电话沟通
+                            </button>
+                        </div>
+                        <span class="text-xs text-gray-500">
+                            农户联系方式：138****8888
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 待审核内容 -->
+            <div class="content-card">
+                <div class="p-6">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="flex items-center gap-3">
+                            <span class="status-badge status-pending">待审核</span>
+                            <span class="text-sm text-gray-500">ID: #12848</span>
+                        </div>
+                        <span class="text-sm text-gray-500">30分钟前</span>
+                    </div>
+                    
+                    <div class="flex mb-4">
+                        <img src="https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=100&h=100&fit=crop" 
+                             alt="农作物照片" class="content-image">
+                        <div class="flex-1">
+                            <div class="flex items-center mb-2">
+                                <h4 class="font-bold text-gray-800 mr-3">张大爷的水稻</h4>
+                                <span class="text-sm text-gray-600">江苏省 · 张大爷</span>
+                            </div>
+                            <p class="text-gray-700 mb-2">
+                                今天给水稻施了有机肥，长势不错。天气也很好，适合水稻生长。
+                            </p>
+                            <div class="flex items-center text-sm text-gray-500">
+                                <span class="mr-4">
+                                    <i class="fas fa-tag mr-1"></i>
+                                    标签：施肥、生长记录
+                                </span>
+                                <span>第89天</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <button class="action-btn btn-approve" onclick="approveContent(12848)">
+                                <i class="fas fa-check mr-1"></i>
+                                通过
+                            </button>
+                            <button class="action-btn btn-reject" onclick="rejectContent(12848)">
+                                <i class="fas fa-times mr-1"></i>
+                                拒绝
+                            </button>
+                            <button class="action-btn btn-edit" onclick="editContent(12848)">
+                                <i class="fas fa-edit mr-1"></i>
+                                帮助完善
+                            </button>
+                        </div>
+                        <span class="text-xs text-gray-500">
+                            农户联系方式：138****6666
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 已通过内容 -->
+            <div class="content-card">
+                <div class="p-6">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="flex items-center gap-3">
+                            <span class="status-badge status-approved">已通过</span>
+                            <span class="text-sm text-gray-500">ID: #12849</span>
+                            <span class="text-sm text-green-600">
+                                <i class="fas fa-robot mr-1"></i>
+                                自动通过
+                            </span>
+                        </div>
+                        <span class="text-sm text-gray-500">1小时前</span>
+                    </div>
+                    
+                    <div class="flex mb-4">
+                        <img src="https://images.unsplash.com/photo-1586771107445-d3ca888129ff?w=100&h=100&fit=crop" 
+                             alt="农作物照片" class="content-image">
+                        <div class="flex-1">
+                            <div class="flex items-center mb-2">
+                                <h4 class="font-bold text-gray-800 mr-3">李农户的小麦</h4>
+                                <span class="text-sm text-gray-600">山东省 · 李农户</span>
+                            </div>
+                            <p class="text-gray-700 mb-2">
+                                小麦进入抽穗期，长势良好。今天天气晴朗，有利于小麦发育。
+                            </p>
+                            <div class="flex items-center text-sm text-gray-500">
+                                <span class="mr-4">
+                                    <i class="fas fa-eye mr-1"></i>
+                                    浏览：234次
+                                </span>
+                                <span class="mr-4">
+                                    <i class="fas fa-heart mr-1"></i>
+                                    点赞：18次
+                                </span>
+                                <span>第156天</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center justify-between">
+                        <div class="text-sm text-green-600">
+                            <i class="fas fa-check-circle mr-1"></i>
+                            系统自动审核通过，内容符合规范
+                        </div>
+                        <button class="text-gray-500 hover:text-gray-700 text-sm" onclick="viewDetails(12849)">
+                            查看详情
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 操作日志 -->
+        <div class="content-card">
+            <div class="p-6">
+                <h3 class="text-lg font-bold text-gray-800 mb-4">
+                    <i class="fas fa-history mr-2"></i>
+                    操作日志
+                </h3>
+                
+                <div class="space-y-3">
+                    <div class="log-entry action-reject">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="font-medium text-gray-800">隐藏违规内容 #12847</p>
+                                <p class="text-sm text-gray-600">原因：虚假宣传，已发送短信提醒农户</p>
+                                <p class="text-xs text-gray-500 mt-1">操作人：张管理员</p>
+                            </div>
+                            <span class="text-xs text-gray-500">2小时前</span>
+                        </div>
+                    </div>
+                    
+                    <div class="log-entry action-edit">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="font-medium text-gray-800">帮助完善内容 #12843</p>
+                                <p class="text-sm text-gray-600">为王大叔补充了作物品种和种植面积信息</p>
+                                <p class="text-xs text-gray-500 mt-1">操作人：张管理员</p>
+                            </div>
+                            <span class="text-xs text-gray-500">3小时前</span>
+                        </div>
+                    </div>
+                    
+                    <div class="log-entry action-approve">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="font-medium text-gray-800">批量通过15条内容</p>
+                                <p class="text-sm text-gray-600">内容符合平台规范，自动通过审核</p>
+                                <p class="text-xs text-gray-500 mt-1">操作人：系统自动</p>
+                            </div>
+                            <span class="text-xs text-gray-500">4小时前</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 处理违规内容模态框 -->
+    <div class="modal-overlay" id="violationModal">
+        <div class="modal-content">
+            <div class="p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-lg font-bold text-gray-800">处理违规内容</h3>
+                    <button onclick="closeModal('violationModal')" class="text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                
+                <div class="mb-6">
+                    <h4 class="font-medium text-gray-800 mb-3">处理方式</h4>
+                    <div class="space-y-3">
+                        <label class="flex items-center">
+                            <input type="radio" name="violationAction" value="hide" checked class="mr-3">
+                            <span>隐藏内容并发送短信提醒</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="radio" name="violationAction" value="delete" class="mr-3">
+                            <span>删除内容（严重违规）</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="radio" name="violationAction" value="edit" class="mr-3">
+                            <span>协助修改内容</span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="mb-6">
+                    <h4 class="font-medium text-gray-800 mb-3">短信内容预览</h4>
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <p class="text-sm text-gray-700" id="smsPreview">
+                            您好！您发布的内容不太合适，我们已经帮您暂时隐藏了。
+                            如果有疑问，可以打电话400-888-9999，我们来帮您解决。
+                        </p>
+                    </div>
+                    <textarea class="w-full mt-3 p-3 border border-gray-300 rounded-lg text-sm" 
+                              rows="3" 
+                              placeholder="可以修改短信内容，使用口语化表达..."
+                              id="customSms"></textarea>
+                </div>
+                
+                <div class="flex gap-3">
+                    <button class="flex-1 action-btn btn-reject" onclick="confirmViolationAction()">
+                        确认处理
+                    </button>
+                    <button class="flex-1 action-btn" onclick="closeModal('violationModal')" style="background: #6b7280; color: white;">
+                        取消
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 编辑内容模态框 -->
+    <div class="modal-overlay" id="editModal">
+        <div class="modal-content">
+            <div class="p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-lg font-bold text-gray-800">帮助农户完善内容</h3>
+                    <button onclick="closeModal('editModal')" class="text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">作物描述</label>
+                    <textarea class="w-full p-3 border border-gray-300 rounded-lg" 
+                              rows="4" 
+                              id="editDescription"
+                              placeholder="帮助农户完善作物描述..."></textarea>
+                </div>
+                
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">补充信息</label>
+                    <div class="grid grid-cols-2 gap-4">
+                        <input type="text" 
+                               class="p-3 border border-gray-300 rounded-lg" 
+                               placeholder="作物品种"
+                               id="cropVariety">
+                        <input type="text" 
+                               class="p-3 border border-gray-300 rounded-lg" 
+                               placeholder="种植面积"
+                               id="cropArea">
+                    </div>
+                </div>
+                
+                <div class="mb-6 bg-blue-50 p-4 rounded-lg">
+                    <h5 class="font-medium text-blue-800 mb-2">操作说明</h5>
+                    <p class="text-sm text-blue-700">
+                        此操作将记录在操作日志中，农户可以看到您的帮助。
+                        建议在修改前电话联系农户说明情况。
+                    </p>
+                </div>
+                
+                <div class="flex gap-3">
+                    <button class="flex-1 action-btn btn-edit" onclick="confirmEdit()">
+                        确认修改
+                    </button>
+                    <button class="flex-1 action-btn btn-contact" onclick="callFarmerFirst()">
+                        先打电话沟通
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 处理违规内容
+        function handleViolation(contentId) {
+            document.getElementById('violationModal').classList.add('show');
+        }
+
+        // 编辑内容
+        function editContent(contentId) {
+            // 预填充现有内容
+            document.getElementById('editDescription').value = "今天玉米长得特别好，用的都是有机肥料。种植过程严格按照绿色标准执行。";
+            document.getElementById('cropVariety').value = "甜玉米";
+            document.getElementById('cropArea').value = "5亩";
+            
+            document.getElementById('editModal').classList.add('show');
+        }
+
+        // 联系农户
+        function contactFarmer(name, phone) {
+            if (confirm(`确定要拨打电话给${name}（${phone}）吗？`)) {
+                alert(`正在为您拨打电话：${phone}\n\n通话要点：\n1. 说明身份和来意\n2. 用通俗易懂的语言解释问题\n3. 耐心协助解决\n4. 记录通话结果`);
+                
+                // 记录电话支持操作
+                logPhoneSupport(name, phone);
+            }
+        }
+
+        // 记录电话支持
+        function logPhoneSupport(name, phone) {
+            const logEntry = document.createElement('div');
+            logEntry.className = 'log-entry action-edit';
+            logEntry.innerHTML = `
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="font-medium text-gray-800">电话支持：${name}</p>
+                        <p class="text-sm text-gray-600">联系电话：${phone}，协助解决内容问题</p>
+                        <p class="text-xs text-gray-500 mt-1">操作人：张管理员</p>
+                    </div>
+                    <span class="text-xs text-gray-500">刚刚</span>
+                </div>
+            `;
+            
+            const logContainer = document.querySelector('.space-y-3');
+            logContainer.insertBefore(logEntry, logContainer.firstChild);
+        }
+
+        // 确认违规处理
+        function confirmViolationAction() {
+            const action = document.querySelector('input[name="violationAction"]:checked').value;
+            const customSms = document.getElementById('customSms').value;
+            
+            let message = '';
+            switch(action) {
+                case 'hide':
+                    message = '内容已隐藏，短信提醒已发送给农户';
+                    break;
+                case 'delete':
+                    message = '内容已删除，短信通知已发送给农户';
+                    break;
+                case 'edit':
+                    message = '已协助修改内容，短信通知已发送给农户';
+                    break;
+            }
+            
+            alert(message);
+            closeModal('violationModal');
+            
+            // 更新内容状态
+            updateContentStatus();
+        }
+
+        // 确认编辑
+        function confirmEdit() {
+            const description = document.getElementById('editDescription').value;
+            const variety = document.getElementById('cropVariety').value;
+            const area = document.getElementById('cropArea').value;
+            
+            alert(`内容已更新：\n描述：${description}\n品种：${variety}\n面积：${area}\n\n操作已记录到日志中`);
+            closeModal('editModal');
+            
+            // 记录编辑操作
+            logEditAction();
+        }
+
+        // 先打电话沟通
+        function callFarmerFirst() {
+            closeModal('editModal');
+            contactFarmer('王大叔', '138****8888');
+        }
+
+        // 记录编辑操作
+        function logEditAction() {
+            const logEntry = document.createElement('div');
+            logEntry.className = 'log-entry action-edit';
+            logEntry.innerHTML = `
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="font-medium text-gray-800">帮助完善内容 #12847</p>
+                        <p class="text-sm text-gray-600">补充了作物品种、种植面积等信息</p>
+                        <p class="text-xs text-gray-500 mt-1">操作人：张管理员</p>
+                    </div>
+                    <span class="text-xs text-gray-500">刚刚</span>
+                </div>
+            `;
+            
+            const logContainer = document.querySelector('.space-y-3');
+            logContainer.insertBefore(logEntry, logContainer.firstChild);
+        }
+
+        // 关闭模态框
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('show');
+        }
+
+        // 通过内容
+        function approveContent(contentId) {
+            alert(`内容 #${contentId} 已通过审核`);
+            updateContentStatus();
+        }
+
+        // 拒绝内容
+        function rejectContent(contentId) {
+            if (confirm('确定要拒绝这个内容吗？')) {
+                alert(`内容 #${contentId} 已被拒绝`);
+                updateContentStatus();
+            }
+        }
+
+        // 更新内容状态
+        function updateContentStatus() {
+            // 这里可以更新UI状态
+            console.log('内容状态已更新');
+        }
+
+        // 筛选功能
+        function filterContent(status) {
+            console.log('筛选状态：', status);
+            // 实际应用中这里会过滤显示内容
+        }
+
+        function searchFarmer(name) {
+            console.log('搜索农户：', name);
+        }
+
+        function filterByDate(date) {
+            console.log('筛选日期：', date);
+        }
+
+        // 批量操作
+        function batchApprove() {
+            if (confirm('确定要批量通过所有待审核内容吗？')) {
+                alert('批量操作完成：3条内容已通过审核');
+            }
+        }
+
+        // 切换标签页
+        function switchTab(tab) {
+            alert(`切换到${tab}页面`);
+        }
+
+        // 查看详情
+        function viewDetails(contentId) {
+            alert(`查看内容 #${contentId} 详情`);
+        }
+
+        // 返回
+        function goBack() {
+            history.back();
+        }
+
+        // 退出登录
+        function logout() {
+            if (confirm('确定要退出登录吗？')) {
+                alert('已退出登录');
+            }
+        }
+
+        // 页面加载完成
+        document.addEventListener('DOMContentLoaded', function() {
+            // 初始化页面
+            console.log('内容审核页面已加载');
+            
+            // 模拟实时更新
+            setInterval(function() {
+                // 这里可以轮询获取新的待审核内容
+            }, 30000);
+        });
+
+        // 短信内容预览更新
+        document.querySelector('input[name="violationAction"]').addEventListener('change', function() {
+            const smsPreview = document.getElementById('smsPreview');
+            const action = this.value;
+            
+            let preview = '';
+            switch(action) {
+                case 'hide':
+                    preview = '您好！您发布的内容不太合适，我们已经帮您暂时隐藏了。如果有疑问，可以打电话400-888-9999，我们来帮您解决。';
+                    break;
+                case 'delete':
+                    preview = '您好！您发布的内容违反了平台规定，已经被删除。如果有疑问，可以打电话400-888-9999咨询。';
+                    break;
+                case 'edit':
+                    preview = '您好！我们帮您完善了发布的内容信息，现在更准确了。如有问题可以打电话400-888-9999。';
+                    break;
+            }
+            
+            smsPreview.textContent = preview;
+        });
+    </script>
+</body>
+</html>

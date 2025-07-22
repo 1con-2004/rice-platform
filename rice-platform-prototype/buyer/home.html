@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智慧农业溯源 - 无门槛查看</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="../assets/styles.css" rel="stylesheet">
+    <style>
+        .crop-card {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+        
+        .crop-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 20px -5px rgba(0, 0, 0, 0.15);
+        }
+        
+        .crop-image {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+        
+        .crop-card:hover .crop-image {
+            transform: scale(1.05);
+        }
+        
+        .crop-info {
+            padding: 16px;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+        
+        .status-growing {
+            background: #dcfce7;
+            color: #16a34a;
+        }
+        
+        .status-harvesting {
+            background: #fed7aa;
+            color: #ea580c;
+        }
+        
+        .status-completed {
+            background: #e0e7ff;
+            color: #4338ca;
+        }
+        
+        .search-bar {
+            background: white;
+            border-radius: 25px;
+            padding: 12px 20px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+        
+        .search-input {
+            flex: 1;
+            border: none;
+            outline: none;
+            font-size: 16px;
+            margin-left: 12px;
+        }
+        
+        .category-tab {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 20px;
+            background: #f3f4f6;
+            color: #6b7280;
+            text-decoration: none;
+            margin-right: 12px;
+            margin-bottom: 8px;
+            transition: all 0.2s ease;
+            font-weight: 500;
+        }
+        
+        .category-tab.active {
+            background: #16a34a;
+            color: white;
+        }
+        
+        .quick-access {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            border-radius: 16px;
+            padding: 20px;
+            color: white;
+            margin-bottom: 24px;
+        }
+        
+        .floating-register {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: #f59e0b;
+            color: white;
+            border-radius: 50px;
+            padding: 12px 24px;
+            box-shadow: 0 8px 16px -4px rgba(0, 0, 0, 0.2);
+            font-weight: bold;
+            font-size: 14px;
+            z-index: 1000;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        .hero-section {
+            background: linear-gradient(135deg, #86efac, #4ade80, #22c55e, #16a34a);
+            background-size: 400% 400%;
+            animation: gradientShift 6s ease-in-out infinite;
+            color: white;
+            padding: 0;
+            margin: 0 -24px 24px -24px;
+            position: relative;
+            overflow: hidden;
+            height: 300px;
+        }
+        
+        @keyframes gradientShift {
+            0%, 100% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+        }
+        
+        .carousel-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            height: 100%;
+            border-radius: 0;
+            overflow: hidden;
+            touch-action: pan-y;
+        }
+        
+        .carousel-slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+        
+        .carousel-slide.active {
+            opacity: 1;
+        }
+        
+        .carousel-indicators {
+            position: absolute;
+            bottom: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 8px;
+        }
+        
+        .carousel-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.5);
+            transition: background 0.3s ease;
+        }
+        
+        .carousel-dot.active {
+            background: white;
+        }
+        
+        .loading-skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+        }
+        
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- iOS状态栏 -->
+    <div class="status-bar">
+        <div class="status-left">
+            <span>9:41</span>
+        </div>
+        <div class="status-right">
+            <i class="fas fa-signal text-sm"></i>
+            <i class="fas fa-wifi text-sm"></i>
+            <div class="battery">
+                <div class="battery-level"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 英雄区域 -->
+    <div class="hero-section">
+        <div class="carousel-container">
+            <div class="carousel-slide active" style="background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.1)), url('https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=800&h=300&fit=crop')">
+                <div class="absolute top-6 left-6">
+                    <h1 class="text-2xl font-bold mb-2">
+                        <i class="fas fa-seedling mr-2"></i>
+                        智慧农业溯源
+                    </h1>
+                    <p class="text-green-100 text-lg">新鲜稻米，从田间到餐桌</p>
+                </div>
+            </div>
+            <div class="carousel-slide" style="background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.1)), url('https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=800&h=300&fit=crop')">
+                <div class="absolute top-6 left-6">
+                    <h1 class="text-2xl font-bold mb-2">
+                        <i class="fas fa-seedling mr-2"></i>
+                        智慧农业溯源
+                    </h1>
+                    <p class="text-green-100 text-lg">优质小麦，传统工艺</p>
+                </div>
+            </div>
+            <div class="carousel-slide" style="background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.1)), url('https://images.unsplash.com/photo-1586771107445-d3ca888129ff?w=800&h=300&fit=crop')">
+                <div class="absolute top-6 left-6">
+                    <h1 class="text-2xl font-bold mb-2">
+                        <i class="fas fa-seedling mr-2"></i>
+                        智慧农业溯源
+                    </h1>
+                    <p class="text-green-100 text-lg">甜美玉米，有机种植</p>
+                </div>
+            </div>
+            <div class="carousel-indicators">
+                <div class="carousel-dot active"></div>
+                <div class="carousel-dot"></div>
+                <div class="carousel-dot"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 主内容区域 -->
+    <div class="px-6">
+        <!-- 搜索栏 -->
+        <div class="search-bar" onclick="goToSearch()">
+            <i class="fas fa-search text-gray-400"></i>
+            <input type="text" class="search-input" placeholder="搜索作物类型、农场名称..." readonly>
+            <i class="fas fa-filter text-gray-400"></i>
+        </div>
+
+
+        <!-- 分类标签 -->
+        <div class="mb-6">
+            <div class="flex flex-wrap">
+                <a href="#" class="category-tab active">全部</a>
+                <a href="#" class="category-tab">水稻</a>
+                <a href="#" class="category-tab">小麦</a>
+                <a href="#" class="category-tab">玉米</a>
+                <a href="#" class="category-tab">蔬菜</a>
+                <a href="#" class="category-tab">果树</a>
+            </div>
+        </div>
+
+        <!-- 热门作物列表 -->
+        <div class="mb-6">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-xl font-bold text-gray-800">热门作物</h3>
+                <span class="text-sm text-gray-500">实时更新</span>
+            </div>
+
+            <!-- 作物卡片 1 -->
+            <div class="crop-card" onclick="openCropDetail(1)">
+                <div class="relative">
+                    <img src="https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=400&h=180&fit=crop" 
+                         alt="水稻田" class="crop-image loading-skeleton">
+                    <div class="absolute top-3 left-3">
+                        <span class="status-badge status-growing">生长中</span>
+                    </div>
+                    <div class="absolute top-3 right-3 bg-black bg-opacity-50 text-white px-2 py-1 rounded text-xs">
+                        <i class="fas fa-eye mr-1"></i>1.2k 关注
+                    </div>
+                </div>
+                <div class="crop-info">
+                    <h4 class="text-lg font-bold text-gray-800 mb-2">张大爷的优质水稻</h4>
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center text-gray-600">
+                            <i class="fas fa-map-marker-alt mr-1"></i>
+                            <span class="text-sm">江苏省扬州市</span>
+                        </div>
+                        <div class="text-sm text-gray-500">第89天</div>
+                    </div>
+                    <p class="text-gray-600 text-sm mb-3">绿色种植，不使用化学农药，记录完整的生长过程</p>
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center text-green-600">
+                            <i class="fas fa-camera mr-1"></i>
+                            <span class="text-sm">12条记录</span>
+                        </div>
+                        <div class="text-xs text-gray-400">2小时前更新</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 作物卡片 2 -->
+            <div class="crop-card" onclick="openCropDetail(2)">
+                <div class="relative">
+                    <img src="https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=400&h=180&fit=crop" 
+                         alt="小麦田" class="crop-image">
+                    <div class="absolute top-3 left-3">
+                        <span class="status-badge status-harvesting">收获期</span>
+                    </div>
+                    <div class="absolute top-3 right-3 bg-black bg-opacity-50 text-white px-2 py-1 rounded text-xs">
+                        <i class="fas fa-eye mr-1"></i>856 关注
+                    </div>
+                </div>
+                <div class="crop-info">
+                    <h4 class="text-lg font-bold text-gray-800 mb-2">李农户的黄金小麦</h4>
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center text-gray-600">
+                            <i class="fas fa-map-marker-alt mr-1"></i>
+                            <span class="text-sm">山东省济南市</span>
+                        </div>
+                        <div class="text-sm text-gray-500">第156天</div>
+                    </div>
+                    <p class="text-gray-600 text-sm mb-3">传统种植工艺，即将进入收获季，颗粒饱满</p>
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center text-green-600">
+                            <i class="fas fa-camera mr-1"></i>
+                            <span class="text-sm">28条记录</span>
+                        </div>
+                        <div class="text-xs text-gray-400">5小时前更新</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 作物卡片 3 -->
+            <div class="crop-card" onclick="openCropDetail(3)">
+                <div class="relative">
+                    <img src="https://images.unsplash.com/photo-1586771107445-d3ca888129ff?w=400&h=180&fit=crop" 
+                         alt="玉米田" class="crop-image">
+                    <div class="absolute top-3 left-3">
+                        <span class="status-badge status-growing">生长中</span>
+                    </div>
+                    <div class="absolute top-3 right-3 bg-black bg-opacity-50 text-white px-2 py-1 rounded text-xs">
+                        <i class="fas fa-eye mr-1"></i>632 关注
+                    </div>
+                </div>
+                <div class="crop-info">
+                    <h4 class="text-lg font-bold text-gray-800 mb-2">王大叔的甜玉米</h4>
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center text-gray-600">
+                            <i class="fas fa-map-marker-alt mr-1"></i>
+                            <span class="text-sm">河北省保定市</span>
+                        </div>
+                        <div class="text-sm text-gray-500">第67天</div>
+                    </div>
+                    <p class="text-gray-600 text-sm mb-3">有机种植，预计8月收获，口感甜美</p>
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center text-green-600">
+                            <i class="fas fa-camera mr-1"></i>
+                            <span class="text-sm">15条记录</span>
+                        </div>
+                        <div class="text-xs text-gray-400">1天前更新</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 作物卡片 4 -->
+            <div class="crop-card" onclick="openCropDetail(4)">
+                <div class="relative">
+                    <img src="https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&h=180&fit=crop" 
+                         alt="蔬菜" class="crop-image">
+                    <div class="absolute top-3 left-3">
+                        <span class="status-badge status-completed">已收获</span>
+                    </div>
+                    <div class="absolute top-3 right-3 bg-black bg-opacity-50 text-white px-2 py-1 rounded text-xs">
+                        <i class="fas fa-eye mr-1"></i>445 关注
+                    </div>
+                </div>
+                <div class="crop-info">
+                    <h4 class="text-lg font-bold text-gray-800 mb-2">陈阿姨的有机青菜</h4>
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center text-gray-600">
+                            <i class="fas fa-map-marker-alt mr-1"></i>
+                            <span class="text-sm">浙江省杭州市</span>
+                        </div>
+                        <div class="text-sm text-gray-500">已完成</div>
+                    </div>
+                    <p class="text-gray-600 text-sm mb-3">45天生长周期，全程记录，新鲜上市</p>
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center text-green-600">
+                            <i class="fas fa-camera mr-1"></i>
+                            <span class="text-sm">18条记录</span>
+                        </div>
+                        <div class="text-xs text-gray-400">3天前收获</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 加载更多 -->
+        <div class="text-center mb-8">
+            <button class="bg-green-600 hover:bg-green-700 text-white px-8 py-4 rounded-full text-lg font-semibold transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105" onclick="loadMore()">
+                <i class="fas fa-chevron-down mr-2"></i>
+                查看更多作物
+            </button>
+        </div>
+
+        <!-- 注册提示 -->
+        <div class="card text-center mb-8">
+            <div class="w-16 h-16 bg-yellow-100 rounded-full mx-auto mb-4 flex items-center justify-center">
+                <i class="fas fa-star text-2xl text-yellow-600"></i>
+            </div>
+            <h3 class="text-lg font-bold text-gray-800 mb-2">喜欢某个作物？</h3>
+            <p class="text-gray-600 mb-4">注册后可以关注农田，接收收获提醒</p>
+        </div>
+    </div>
+
+    <!-- 悬浮注册按钮 -->
+    <button class="floating-register" onclick="showRegister()">
+        <i class="fas fa-gift mr-2"></i>
+        可选注册
+    </button>
+
+    <!-- 底部信息 -->
+    <div class="bg-gray-800 text-white py-8 text-center">
+        <div class="px-6">
+            <h4 class="text-lg font-bold mb-2">智慧农业溯源平台</h4>
+            <p class="text-gray-300 text-sm mb-4">让农产品的每一天都可追溯</p>
+            <div class="text-xs text-gray-400">
+                <p>无需注册即可查看 | 真实农田记录 | 24小时更新</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 跳转到搜索页面
+        function goToSearch() {
+            console.log('跳转到搜索页面');
+            // 实际应用中这里会导航到搜索页面
+        }
+
+        // 打开作物详情
+        function openCropDetail(cropId) {
+            console.log('打开作物详情：', cropId);
+            // 实际应用中这里会导航到作物详情页面
+        }
+
+        // 显示注册页面
+        function showRegister() {
+            alert('注册功能：这里可以注册账号，获得更多功能如关注、收藏等');
+        }
+
+        // 加载更多
+        function loadMore() {
+            console.log('加载更多作物');
+            // 模拟加载
+            const button = event.target;
+            button.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>加载中...';
+            
+            setTimeout(() => {
+                button.innerHTML = '<i class="fas fa-chevron-down mr-2"></i>查看更多作物';
+                alert('已为您加载更多作物！');
+            }, 2000);
+        }
+
+        // 轮播图功能
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.carousel-slide');
+        const dots = document.querySelectorAll('.carousel-dot');
+        let autoPlayInterval;
+        
+        function showSlide(index) {
+            slides.forEach((slide, i) => {
+                slide.classList.toggle('active', i === index);
+            });
+            dots.forEach((dot, i) => {
+                dot.classList.toggle('active', i === index);
+            });
+            currentSlide = index;
+        }
+        
+        function nextSlide() {
+            const nextIndex = (currentSlide + 1) % slides.length;
+            showSlide(nextIndex);
+        }
+        
+        function prevSlide() {
+            const prevIndex = (currentSlide - 1 + slides.length) % slides.length;
+            showSlide(prevIndex);
+        }
+        
+        // 开始自动轮播
+        function startAutoPlay() {
+            stopAutoPlay();
+            autoPlayInterval = setInterval(nextSlide, 5000);
+        }
+        
+        // 停止自动轮播
+        function stopAutoPlay() {
+            if (autoPlayInterval) {
+                clearInterval(autoPlayInterval);
+            }
+        }
+        
+        // 初始化自动轮播
+        startAutoPlay();
+        
+        // 点击指示器切换
+        dots.forEach((dot, index) => {
+            dot.addEventListener('click', () => {
+                showSlide(index);
+                stopAutoPlay();
+                setTimeout(startAutoPlay, 3000); // 3秒后恢复自动播放
+            });
+        });
+
+        // 触摸滑动支持
+        let startX = 0;
+        let startY = 0;
+        let isDragging = false;
+        
+        const carouselContainer = document.querySelector('.carousel-container');
+        
+        // 触摸开始
+        carouselContainer.addEventListener('touchstart', function(e) {
+            startX = e.touches[0].clientX;
+            startY = e.touches[0].clientY;
+            isDragging = true;
+            stopAutoPlay();
+        }, { passive: true });
+        
+        // 触摸移动
+        carouselContainer.addEventListener('touchmove', function(e) {
+            if (!isDragging) return;
+            
+            const currentX = e.touches[0].clientX;
+            const currentY = e.touches[0].clientY;
+            const diffX = startX - currentX;
+            const diffY = startY - currentY;
+            
+            // 如果是水平滑动，阻止默认行为
+            if (Math.abs(diffX) > Math.abs(diffY)) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+        
+        // 触摸结束
+        carouselContainer.addEventListener('touchend', function(e) {
+            if (!isDragging) return;
+            isDragging = false;
+            
+            const endX = e.changedTouches[0].clientX;
+            const diffX = startX - endX;
+            const threshold = 50; // 滑动阈值
+            
+            if (Math.abs(diffX) > threshold) {
+                if (diffX > 0) {
+                    // 向左滑动，下一张
+                    nextSlide();
+                } else {
+                    // 向右滑动，上一张
+                    prevSlide();
+                }
+            }
+            
+            // 3秒后恢复自动播放
+            setTimeout(startAutoPlay, 3000);
+        }, { passive: true });
+        
+        // 鼠标拖拽支持（桌面端）
+        let mouseStartX = 0;
+        let isMouseDragging = false;
+        
+        carouselContainer.addEventListener('mousedown', function(e) {
+            mouseStartX = e.clientX;
+            isMouseDragging = true;
+            stopAutoPlay();
+        });
+        
+        carouselContainer.addEventListener('mousemove', function(e) {
+            if (!isMouseDragging) return;
+            e.preventDefault();
+        });
+        
+        carouselContainer.addEventListener('mouseup', function(e) {
+            if (!isMouseDragging) return;
+            isMouseDragging = false;
+            
+            const endX = e.clientX;
+            const diffX = mouseStartX - endX;
+            const threshold = 50;
+            
+            if (Math.abs(diffX) > threshold) {
+                if (diffX > 0) {
+                    nextSlide();
+                } else {
+                    prevSlide();
+                }
+            }
+            
+            setTimeout(startAutoPlay, 3000);
+        });
+        
+        // 鼠标离开时停止拖拽
+        carouselContainer.addEventListener('mouseleave', function() {
+            if (isMouseDragging) {
+                isMouseDragging = false;
+                setTimeout(startAutoPlay, 3000);
+            }
+        });
+
+        // 图片懒加载和网络优化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 模拟网络检测
+            function detectNetworkSpeed() {
+                if (navigator.connection) {
+                    const effectiveType = navigator.connection.effectiveType;
+                    return effectiveType === 'slow-2g' || effectiveType === '2g';
+                }
+                return false;
+            }
+
+            // 如果网络较慢，替换为低质量图片
+            if (detectNetworkSpeed()) {
+                const images = document.querySelectorAll('.crop-image');
+                images.forEach(img => {
+                    const src = img.src;
+                    img.src = src.replace('w=400&h=180', 'w=200&h=90&q=50');
+                });
+            }
+
+            // 模拟图片加载完成，移除skeleton效果
+            setTimeout(() => {
+                document.querySelectorAll('.loading-skeleton').forEach(el => {
+                    el.classList.remove('loading-skeleton');
+                });
+            }, 1500);
+        });
+
+        // 分类标签切换
+        document.querySelectorAll('.category-tab').forEach(tab => {
+            tab.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // 移除所有active类
+                document.querySelectorAll('.category-tab').forEach(t => {
+                    t.classList.remove('active');
+                });
+                
+                // 给当前标签添加active类
+                this.classList.add('active');
+                
+                // 模拟加载不同分类的数据
+                console.log('切换到分类：', this.textContent);
+            });
+        });
+
+        // 防止快速点击
+        let lastClickTime = 0;
+        document.querySelectorAll('.crop-card').forEach(card => {
+            card.addEventListener('click', function(e) {
+                const now = Date.now();
+                if (now - lastClickTime < 1000) {
+                    e.preventDefault();
+                    return;
+                }
+                lastClickTime = now;
+            });
+        });
+    </script>
+</body>
+</html>

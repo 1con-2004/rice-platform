@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>农民登录 - 智慧农业溯源</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="../assets/styles.css" rel="stylesheet">
+</head>
+<body class="bg-green-50">
+    <!-- iOS状态栏 -->
+    <div class="status-bar">
+        <div class="status-left">
+            <span>9:41</span>
+        </div>
+        <div class="status-right">
+            <i class="fas fa-signal text-sm"></i>
+            <i class="fas fa-wifi text-sm"></i>
+            <div class="battery">
+                <div class="battery-level"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 主内容区域 -->
+    <div class="min-h-screen bg-gradient-to-b from-green-50 to-green-100 pb-20">
+        <!-- 头部标题区域 -->
+        <div class="text-center pt-12 pb-8">
+            <div class="w-24 h-24 bg-green-600 rounded-full mx-auto mb-6 flex items-center justify-center">
+                <i class="fas fa-seedling text-4xl text-white"></i>
+            </div>
+            <h1 class="header-elderly text-green-800 mb-2">智慧农业溯源</h1>
+            <p class="text-elderly text-green-600">记录作物成长的每一天</p>
+        </div>
+
+        <!-- 登录表单 -->
+        <div class="px-6" id="loginForm">
+            <div class="card">
+                <h2 class="title-elderly text-center text-green-800 mb-8">农民登录</h2>
+                
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-user mr-2 text-green-600"></i>
+                        账号
+                    </label>
+                    <input type="text" class="form-input" placeholder="手机号或用户名" id="loginAccount">
+                    <p class="text-sm text-gray-500 mt-2">请输入您的手机号或用户名</p>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-lock mr-2 text-green-600"></i>
+                        密码
+                    </label>
+                    <input type="password" class="form-input" placeholder="请输入密码" id="loginPassword">
+                </div>
+
+                <button class="btn-large btn-primary w-full mb-4" onclick="handleLogin()">
+                    <i class="fas fa-sign-in-alt"></i>
+                    立即登录
+                </button>
+
+                <div class="text-center">
+                    <button class="text-green-600 text-lg underline" onclick="showRegister()">
+                        还没有账号？立即注册
+                    </button>
+                </div>
+
+                <div class="text-center mt-6">
+                    <button class="text-gray-500 text-base underline" onclick="forgotPassword()">
+                        忘记密码？
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 注册表单 -->
+        <div class="px-6 hidden" id="registerForm">
+            <div class="card">
+                <h2 class="title-elderly text-center text-green-800 mb-8">农民注册</h2>
+                
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-user mr-2 text-green-600"></i>
+                        账号
+                    </label>
+                    <input type="text" class="form-input" placeholder="手机号或自定义用户名" id="registerAccount">
+                    <p class="text-sm text-gray-500 mt-2">可以使用手机号，也可以自定义用户名</p>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-lock mr-2 text-green-600"></i>
+                        设置密码
+                    </label>
+                    <input type="password" class="form-input" placeholder="请设置登录密码" id="registerPassword">
+                    <p class="text-sm text-gray-500 mt-2">密码用于登录，请牢记</p>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-lock mr-2 text-green-600"></i>
+                        确认密码
+                    </label>
+                    <input type="password" class="form-input" placeholder="再次输入密码" id="confirmPassword">
+                </div>
+
+                <button class="btn-large btn-primary w-full mb-4" onclick="handleRegister()">
+                    <i class="fas fa-user-plus"></i>
+                    立即注册
+                </button>
+
+                <div class="text-center">
+                    <button class="text-green-600 text-lg underline" onclick="showLogin()">
+                        已有账号？立即登录
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 语音提示区域 -->
+        <div class="fixed bottom-24 left-4 right-4" id="voiceHint">
+            <div class="bg-blue-100 border border-blue-300 rounded-lg p-4 flex items-center">
+                <i class="fas fa-volume-up text-blue-600 text-xl mr-3"></i>
+                <p class="text-blue-800 text-lg font-medium" id="hintText">欢迎使用智慧农业溯源系统</p>
+            </div>
+        </div>
+
+        <!-- 操作成功提示 -->
+        <div class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center" id="successModal">
+            <div class="bg-white rounded-xl p-8 mx-6 text-center">
+                <div class="w-16 h-16 bg-green-100 rounded-full mx-auto mb-4 flex items-center justify-center">
+                    <i class="fas fa-check text-2xl text-green-600"></i>
+                </div>
+                <h3 class="title-elderly text-green-800 mb-2">操作成功！</h3>
+                <p class="text-elderly text-gray-600 mb-6" id="successText">登录成功</p>
+                <button class="btn-large btn-primary mx-auto px-8" onclick="closeModal()">
+                    知道了
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 显示注册表单
+        function showRegister() {
+            document.getElementById('loginForm').classList.add('hidden');
+            document.getElementById('registerForm').classList.remove('hidden');
+            showVoiceHint('请填写注册信息');
+        }
+
+        // 显示登录表单
+        function showLogin() {
+            document.getElementById('registerForm').classList.add('hidden');
+            document.getElementById('loginForm').classList.remove('hidden');
+            showVoiceHint('请输入您的账号和密码');
+        }
+
+        // 处理登录
+        function handleLogin() {
+            const account = document.getElementById('loginAccount').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            if (!account) {
+                showVoiceHint('请先输入账号哦');
+                return;
+            }
+            
+            if (!password) {
+                showVoiceHint('请先输入密码哦');
+                return;
+            }
+            
+            // 模拟登录成功
+            showSuccess('登录成功，正在进入系统...');
+            setTimeout(() => {
+                // 实际项目中这里会跳转到主页面
+                closeModal();
+                showVoiceHint('登录成功，欢迎回来！');
+            }, 2000);
+        }
+
+        // 处理注册
+        function handleRegister() {
+            const account = document.getElementById('registerAccount').value;
+            const password = document.getElementById('registerPassword').value;
+            const confirm = document.getElementById('confirmPassword').value;
+            
+            if (!account) {
+                showVoiceHint('请先输入账号哦');
+                return;
+            }
+            
+            if (!password) {
+                showVoiceHint('请先设置密码哦');
+                return;
+            }
+            
+            if (password !== confirm) {
+                showVoiceHint('两次密码不一样，请重新输入');
+                return;
+            }
+            
+            // 模拟注册成功
+            showSuccess('注册成功！您现在可以登录了');
+            setTimeout(() => {
+                closeModal();
+                showLogin();
+                showVoiceHint('注册成功，请登录');
+            }, 2000);
+        }
+
+        // 忘记密码
+        function forgotPassword() {
+            showVoiceHint('请联系客服帮助找回密码：400-123-4567');
+        }
+
+        // 显示语音提示
+        function showVoiceHint(text) {
+            document.getElementById('hintText').textContent = text;
+            
+            // 语音播报（实际项目中可以使用Web Speech API）
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'zh-CN';
+                utterance.rate = 0.8; // 适老化：语速稍慢
+                speechSynthesis.speak(utterance);
+            }
+        }
+
+        // 显示成功提示
+        function showSuccess(text) {
+            document.getElementById('successText').textContent = text;
+            document.getElementById('successModal').classList.remove('hidden');
+            document.getElementById('successModal').classList.add('flex');
+        }
+
+        // 关闭模态框
+        function closeModal() {
+            document.getElementById('successModal').classList.add('hidden');
+            document.getElementById('successModal').classList.remove('flex');
+        }
+
+        // 页面加载完成后的初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            showVoiceHint('欢迎使用智慧农业溯源系统');
+            
+            // 防止误触：延迟显示语音提示
+            setTimeout(() => {
+                document.getElementById('voiceHint').style.display = 'block';
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

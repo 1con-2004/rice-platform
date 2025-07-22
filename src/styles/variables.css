@@ -1,0 +1,42 @@
+/* 智慧农业溯源APP - CSS变量定义 */
+
+/* ===== 基础配置 ===== */
+:root {
+    /* 主题色彩 */
+    --primary-green: #16a34a;
+    --secondary-green: #059669;
+    --light-green: #dcfce7;
+    --accent-yellow: #fbbf24;
+    --light-yellow: #fef3c7;
+    --text-dark: #1f2937;
+    --text-gray: #6b7280;
+    --background-soft: #f9fafb;
+    --border-light: #e5e7eb;
+    
+    /* 真实感增强 */
+    --shadow-realistic: 0 8px 32px rgba(0, 0, 0, 0.12);
+    --shadow-card: 0 4px 16px rgba(0, 0, 0, 0.08);
+    --gradient-primary: linear-gradient(135deg, #16a34a, #059669);
+    --gradient-secondary: linear-gradient(135deg, #f8fafc, #e2e8f0);
+    
+    /* 适老化设计尺寸 */
+    --text-base: 16px;
+    --text-large: 18px;
+    --text-title: 24px;
+    --text-header: 28px;
+    --button-min-size: 60px;
+    --button-spacing: 15px;
+    --border-radius: 12px;
+    --shadow-soft: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    
+    /* 管理端主题色 */
+    --admin-primary: #7c3aed;
+    --admin-secondary: #a855f7;
+    --admin-light: #f3e8ff;
+    
+    /* 状态色彩 */
+    --success-color: #10b981;
+    --warning-color: #f59e0b;
+    --error-color: #ef4444;
+    --info-color: #3b82f6;
+}

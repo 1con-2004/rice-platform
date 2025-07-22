@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个人设置 - 智慧农业溯源</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="../assets/styles.css" rel="stylesheet">
+    <style>
+        .setting-item {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        
+        .setting-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .setting-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            margin-right: 16px;
+        }
+        
+        .setting-content {
+            flex: 1;
+        }
+        
+        .setting-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 4px;
+        }
+        
+        .setting-subtitle {
+            font-size: 14px;
+            color: #6b7280;
+        }
+        
+        .setting-arrow {
+            color: #9ca3af;
+            font-size: 16px;
+        }
+        
+        .profile-header {
+            background: linear-gradient(135deg, #059669, #16a34a);
+            color: white;
+            padding: 24px;
+            border-radius: 16px;
+            margin-bottom: 24px;
+        }
+        
+        .avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            margin-bottom: 16px;
+        }
+        
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+        
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider {
+            background-color: #10b981;
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+    </style>
+</head>
+<body class="bg-green-50">
+    <!-- iOS状态栏 -->
+    <div class="status-bar">
+        <div class="status-left">
+            <span>9:41</span>
+        </div>
+        <div class="status-right">
+            <i class="fas fa-signal text-sm"></i>
+            <i class="fas fa-wifi text-sm"></i>
+            <div class="battery">
+                <div class="battery-level"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 顶部导航栏 -->
+    <div class="top-nav">
+        <button onclick="goBack()" class="text-white text-xl">
+            <i class="fas fa-arrow-left"></i>
+        </button>
+        <span class="header-elderly">个人设置</span>
+        <div></div>
+    </div>
+
+    <!-- 主内容区域 -->
+    <div class="p-6 pb-24">
+        <!-- 个人信息卡片 -->
+        <div class="profile-header">
+            <div class="flex items-center">
+                <div class="avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="ml-4">
+                    <h2 class="text-2xl font-bold mb-2">张大爷</h2>
+                    <p class="text-green-100 text-lg">账号：18888888888</p>
+                    <p class="text-green-100">种植：水稻 | 第89天</p>
+                </div>
+            </div>
+            <button class="btn-large bg-white bg-opacity-20 text-white mt-4 w-full" onclick="editProfile()">
+                <i class="fas fa-edit mr-2"></i>
+                编辑个人信息
+            </button>
+        </div>
+
+        <!-- 账户设置 -->
+        <div class="mb-6">
+            <h3 class="title-elderly text-green-800 mb-4">账户设置</h3>
+            
+            <div class="setting-item" onclick="changePassword()">
+                <div class="setting-icon bg-blue-100 text-blue-600">
+                    <i class="fas fa-key"></i>
+                </div>
+                <div class="setting-content">
+                    <div class="setting-title">修改密码</div>
+                    <div class="setting-subtitle">更改登录密码</div>
+                </div>
+                <div class="setting-arrow">
+                    <i class="fas fa-chevron-right"></i>
+                </div>
+            </div>
+            
+            <div class="setting-item" onclick="manageAccount()">
+                <div class="setting-icon bg-green-100 text-green-600">
+                    <i class="fas fa-user-cog"></i>
+                </div>
+                <div class="setting-content">
+                    <div class="setting-title">账号管理</div>
+                    <div class="setting-subtitle">账号安全设置</div>
+                </div>
+                <div class="setting-arrow">
+                    <i class="fas fa-chevron-right"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- 系统设置 -->
+        <div class="mb-6">
+            <h3 class="title-elderly text-green-800 mb-4">系统设置</h3>
+            
+            <div class="setting-item">
+                <div class="setting-icon bg-purple-100 text-purple-600">
+                    <i class="fas fa-volume-up"></i>
+                </div>
+                <div class="setting-content">
+                    <div class="setting-title">语音提示</div>
+                    <div class="setting-subtitle">开启后操作时会有语音提示</div>
+                </div>
+                <label class="toggle-switch">
+                    <input type="checkbox" checked onchange="toggleVoice(this)">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            
+            <div class="setting-item">
+                <div class="setting-icon bg-orange-100 text-orange-600">
+                    <i class="fas fa-bell"></i>
+                </div>
+                <div class="setting-content">
+                    <div class="setting-title">消息通知</div>
+                    <div class="setting-subtitle">有新消息时震动提醒</div>
+                </div>
+                <label class="toggle-switch">
+                    <input type="checkbox" checked onchange="toggleNotification(this)">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            
+            <div class="setting-item" onclick="displaySettings()">
+                <div class="setting-icon bg-red-100 text-red-600">
+                    <i class="fas fa-eye"></i>
+                </div>
+                <div class="setting-content">
+                    <div class="setting-title">显示设置</div>
+                    <div class="setting-subtitle">字体大小、主题等</div>
+                </div>
+                <div class="setting-arrow">
+                    <i class="fas fa-chevron-right"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- 作物管理 -->
+        <div class="mb-6">
+            <h3 class="title-elderly text-green-800 mb-4">作物管理</h3>
+            
+            <div class="setting-item" onclick="cropSettings()">
+                <div class="setting-icon bg-green-100 text-green-600">
+                    <i class="fas fa-leaf"></i>
+                </div>
+                <div class="setting-content">
+                    <div class="setting-title">作物信息</div>
+                    <div class="setting-subtitle">修改作物类型、种植信息</div>
+                </div>
+                <div class="setting-arrow">
+                    <i class="fas fa-chevron-right"></i>
+                </div>
+            </div>
+            
+            <div class="setting-item" onclick="exportData()">
+                <div class="setting-icon bg-blue-100 text-blue-600">
+                    <i class="fas fa-download"></i>
+                </div>
+                <div class="setting-content">
+                    <div class="setting-title">导出记录</div>
+                    <div class="setting-subtitle">下载所有生长记录</div>
+                </div>
+                <div class="setting-arrow">
+                    <i class="fas fa-chevron-right"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- 帮助与客服 -->
+        <div class="mb-6">
+            <h3 class="title-elderly text-green-800 mb-4">帮助与客服</h3>
+            
+            <div class="setting-item" onclick="callService()">
+                <div class="setting-icon bg-red-100 text-red-600">
+                    <i class="fas fa-phone"></i>
+                </div>
+                <div class="setting-content">
+                    <div class="setting-title">联系客服</div>
+                    <div class="setting-subtitle">400-123-4567</div>
+                </div>
+                <div class="setting-arrow">
+                    <i class="fas fa-external-link-alt"></i>
+                </div>
+            </div>
+            
+            <div class="setting-item" onclick="showHelp()">
+                <div class="setting-icon bg-yellow-100 text-yellow-600">
+                    <i class="fas fa-question-circle"></i>
+                </div>
+                <div class="setting-content">
+                    <div class="setting-title">使用帮助</div>
+                    <div class="setting-subtitle">查看操作指南</div>
+                </div>
+                <div class="setting-arrow">
+                    <i class="fas fa-chevron-right"></i>
+                </div>
+            </div>
+            
+            <div class="setting-item" onclick="aboutApp()">
+                <div class="setting-icon bg-gray-100 text-gray-600">
+                    <i class="fas fa-info-circle"></i>
+                </div>
+                <div class="setting-content">
+                    <div class="setting-title">关于我们</div>
+                    <div class="setting-subtitle">版本信息、使用条款</div>
+                </div>
+                <div class="setting-arrow">
+                    <i class="fas fa-chevron-right"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- 退出登录 -->
+        <div class="mt-8">
+            <button class="btn-large w-full bg-red-500 text-white" onclick="logout()">
+                <i class="fas fa-sign-out-alt mr-2"></i>
+                退出登录
+            </button>
+        </div>
+    </div>
+
+    <!-- 底部导航栏 -->
+    <div class="bottom-nav">
+        <div class="nav-item" onclick="goToMyCrops()">
+            <i class="nav-icon fas fa-leaf"></i>
+            <span>我的作物</span>
+        </div>
+        <div class="nav-item" onclick="goToPublish()">
+            <i class="nav-icon fas fa-plus"></i>
+            <span>发布</span>
+        </div>
+        <div class="nav-item" onclick="goToMessages()">
+            <i class="nav-icon fas fa-comments"></i>
+            <span>消息</span>
+        </div>
+    </div>
+
+    <!-- 语音提示区域 -->
+    <div class="fixed top-20 left-4 right-4 z-50 hidden" id="voiceHint">
+        <div class="bg-blue-100 border border-blue-300 rounded-lg p-4 flex items-center">
+            <i class="fas fa-volume-up text-blue-600 text-xl mr-3"></i>
+            <p class="text-blue-800 text-lg font-medium" id="hintText"></p>
+        </div>
+    </div>
+
+    <!-- 确认对话框 -->
+    <div class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50" id="confirmModal">
+        <div class="bg-white rounded-xl p-8 mx-6 text-center max-w-sm w-full">
+            <div class="w-16 h-16 bg-red-100 rounded-full mx-auto mb-4 flex items-center justify-center">
+                <i class="fas fa-exclamation-triangle text-2xl text-red-600"></i>
+            </div>
+            <h3 class="title-elderly text-gray-800 mb-4" id="confirmTitle">确认操作</h3>
+            <p class="text-elderly text-gray-600 mb-8" id="confirmText">确定要执行此操作吗？</p>
+            <div class="flex gap-4">
+                <button class="btn-large btn-secondary flex-1" onclick="closeConfirmModal()">
+                    取消
+                </button>
+                <button class="btn-large btn-primary flex-1" onclick="confirmAction()">
+                    确定
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let pendingAction = null;
+
+        // 显示语音提示
+        function showVoiceHint(text) {
+            document.getElementById('hintText').textContent = text;
+            const hintEl = document.getElementById('voiceHint');
+            hintEl.classList.remove('hidden');
+            
+            // 语音播报
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'zh-CN';
+                utterance.rate = 0.8;
+                speechSynthesis.speak(utterance);
+            }
+            
+            // 3秒后自动隐藏
+            setTimeout(() => {
+                hintEl.classList.add('hidden');
+            }, 3000);
+        }
+
+        // 显示确认对话框
+        function showConfirmModal(title, text, action) {
+            document.getElementById('confirmTitle').textContent = title;
+            document.getElementById('confirmText').textContent = text;
+            document.getElementById('confirmModal').classList.remove('hidden');
+            document.getElementById('confirmModal').classList.add('flex');
+            pendingAction = action;
+        }
+
+        // 关闭确认对话框
+        function closeConfirmModal() {
+            document.getElementById('confirmModal').classList.add('hidden');
+            document.getElementById('confirmModal').classList.remove('flex');
+            pendingAction = null;
+        }
+
+        // 执行确认的操作
+        function confirmAction() {
+            if (pendingAction) {
+                pendingAction();
+            }
+            closeConfirmModal();
+        }
+
+        // 编辑个人信息
+        function editProfile() {
+            showVoiceHint('正在打开个人信息编辑页面');
+        }
+
+        // 修改密码
+        function changePassword() {
+            showVoiceHint('正在打开密码修改页面');
+        }
+
+        // 账号管理
+        function manageAccount() {
+            showVoiceHint('正在打开账号管理页面');
+        }
+
+        // 切换语音提示
+        function toggleVoice(checkbox) {
+            if (checkbox.checked) {
+                showVoiceHint('语音提示已开启');
+            } else {
+                showVoiceHint('语音提示已关闭');
+            }
+        }
+
+        // 切换消息通知
+        function toggleNotification(checkbox) {
+            if (checkbox.checked) {
+                showVoiceHint('消息通知已开启，有新消息时会震动提醒');
+            } else {
+                showVoiceHint('消息通知已关闭');
+            }
+        }
+
+        // 显示设置
+        function displaySettings() {
+            showVoiceHint('正在打开显示设置页面');
+        }
+
+        // 作物设置
+        function cropSettings() {
+            showVoiceHint('正在打开作物信息设置');
+        }
+
+        // 导出数据
+        function exportData() {
+            showVoiceHint('正在准备导出您的所有生长记录');
+        }
+
+        // 联系客服
+        function callService() {
+            showConfirmModal(
+                '联系客服', 
+                '是否拨打客服电话 400-123-4567？',
+                () => {
+                    showVoiceHint('正在为您拨打客服电话');
+                    // 在实际应用中这里会调用拨号功能
+                    setTimeout(() => {
+                        showVoiceHint('如果无法自动拨号，请手动拨打400-123-4567');
+                    }, 2000);
+                }
+            );
+        }
+
+        // 显示帮助
+        function showHelp() {
+            showVoiceHint('正在打开使用帮助页面');
+        }
+
+        // 关于应用
+        function aboutApp() {
+            showVoiceHint('正在打开关于我们页面');
+        }
+
+        // 退出登录
+        function logout() {
+            showConfirmModal(
+                '退出登录', 
+                '确定要退出当前账号吗？',
+                () => {
+                    showVoiceHint('正在退出登录...');
+                    setTimeout(() => {
+                        showVoiceHint('已成功退出登录');
+                        // 实际应用中这里会跳转到登录页面
+                    }, 1500);
+                }
+            );
+        }
+
+        // 导航功能
+        function goBack() {
+            showVoiceHint('返回上一页');
+        }
+
+        function goToMyCrops() {
+            showVoiceHint('正在打开我的作物');
+        }
+
+        function goToPublish() {
+            showVoiceHint('正在打开发布页面');
+        }
+
+        function goToMessages() {
+            showVoiceHint('正在打开消息中心');
+        }
+
+        // 页面加载完成
+        document.addEventListener('DOMContentLoaded', function() {
+            showVoiceHint('个人设置页面已打开');
+        });
+
+        // 防止误触：延迟响应点击事件
+        document.querySelectorAll('.setting-item').forEach(item => {
+            let touchStartTime = 0;
+            
+            item.addEventListener('touchstart', function() {
+                touchStartTime = Date.now();
+            });
+            
+            item.addEventListener('touchend', function(e) {
+                const touchDuration = Date.now() - touchStartTime;
+                if (touchDuration < 100) {
+                    // 防止误触，触摸时间太短不响应
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
