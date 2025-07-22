@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  # 前端服务
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:80"
+    container_name: rice-platform-frontend
+    restart: unless-stopped
+    networks:
+      - rice-platform-network
+
+  # 预留后端服务配置（待后端开发完成后启用）
+  # backend:
+  #   build:
+  #     context: ./backend
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - "8000:8000"
+  #   container_name: rice-platform-backend
+  #   restart: unless-stopped
+  #   environment:
+  #     - NODE_ENV=production
+  #   networks:
+  #     - rice-platform-network
+  #   depends_on:
+  #     - database
+
+  # 预留数据库服务配置
+  # database:
+  #   image: postgres:15-alpine
+  #   container_name: rice-platform-db
+  #   restart: unless-stopped
+  #   environment:
+  #     POSTGRES_DB: rice_platform
+  #     POSTGRES_USER: rice_user
+  #     POSTGRES_PASSWORD: rice_password
+  #   volumes:
+  #     - postgres_data:/var/lib/postgresql/data
+  #   networks:
+  #     - rice-platform-network
+  #   ports:
+  #     - "5432:5432"
+
+networks:
+  rice-platform-network:
+    driver: bridge
+
+# 预留数据卷配置
+# volumes:
+#   postgres_data:
