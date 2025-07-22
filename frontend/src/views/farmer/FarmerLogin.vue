@@ -251,20 +251,45 @@ const handleLogin = async () => {
   showVoiceHintMsg('正在登录，请稍候...')
   
   try {
-    // 模拟登录请求
-    await new Promise(resolve => setTimeout(resolve, 2000))
+    const response = await fetch('http://localhost:3001/api/auth/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        account: loginForm.account,
+        password: loginForm.password
+      })
+    })
     
-    // 模拟登录成功
-    showSuccess('登录成功，正在进入系统...')
-    setTimeout(() => {
-      closeModal()
-      showVoiceHintMsg('登录成功，欢迎回来！')
-      // 这里可以跳转到其他页面
-      // router.push('/farmer/dashboard')
-    }, 2000)
+    // 检查网络请求是否成功
+    if (!response.ok) {
+      const errorData = await response.json()
+      showVoiceHintMsg(errorData.message || '登录失败，请重试')
+      return
+    }
+    
+    const result = await response.json()
+    
+    if (result.success) {
+      // 保存用户信息和token
+      localStorage.setItem('token', result.data.token)
+      localStorage.setItem('farmer', JSON.stringify(result.data.farmer))
+      
+      showSuccess('登录成功，正在进入系统...')
+      setTimeout(() => {
+        closeModal()
+        showVoiceHintMsg('登录成功，欢迎回来！')
+        // 这里可以跳转到其他页面
+        // router.push('/farmer/dashboard')
+      }, 2000)
+    } else {
+      showVoiceHintMsg(result.message || '登录失败，请重试')
+    }
     
   } catch (error) {
-    showVoiceHintMsg('登录失败，请重试')
+    console.error('登录请求失败:', error)
+    showVoiceHintMsg('网络连接失败，请检查网络后重试')
   } finally {
     loginLoading.value = false
   }
@@ -296,19 +321,45 @@ const handleRegister = async () => {
   showVoiceHintMsg('正在注册，请稍候...')
   
   try {
-    // 模拟注册请求
-    await new Promise(resolve => setTimeout(resolve, 2000))
+    const response = await fetch('http://localhost:3001/api/auth/register', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        account: registerForm.account,
+        password: registerForm.password,
+        confirmPassword: registerForm.confirmPassword
+      })
+    })
     
-    // 模拟注册成功
-    showSuccess('注册成功！您现在可以登录了')
-    setTimeout(() => {
-      closeModal()
-      showLogin()
-      showVoiceHintMsg('注册成功，请登录')
-    }, 2000)
+    // 检查网络请求是否成功
+    if (!response.ok) {
+      const errorData = await response.json()
+      showVoiceHintMsg(errorData.message || '注册失败，请重试')
+      return
+    }
+    
+    const result = await response.json()
+    
+    if (result.success) {
+      showSuccess('注册成功！您现在可以登录了')
+      setTimeout(() => {
+        closeModal()
+        showLogin()
+        showVoiceHintMsg('注册成功，请登录')
+        // 清空注册表单
+        registerForm.account = ''
+        registerForm.password = ''
+        registerForm.confirmPassword = ''
+      }, 2000)
+    } else {
+      showVoiceHintMsg(result.message || '注册失败，请重试')
+    }
     
   } catch (error) {
-    showVoiceHintMsg('注册失败，请重试')
+    console.error('注册请求失败:', error)
+    showVoiceHintMsg('网络连接失败，请检查网络后重试')
   } finally {
     registerLoading.value = false
   }
