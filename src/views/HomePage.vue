@@ -2,45 +2,37 @@
   <div class="homepage">
 
     <!-- Hero区域 -->
-    <section class="hero-gradient min-h-screen relative overflow-hidden" style="padding-top: 60px;">
+    <section class="hero-gradient min-h-screen relative overflow-hidden" style="padding-top: 20px;">
       <!-- 浮动装饰元素 -->
       <div v-for="i in 3" :key="i" class="floating-element" :style="getFloatingStyle(i)"></div>
       
       <div class="container mx-auto px-6 relative z-10">
         <!-- 主标题区域 -->
-        <div class="text-center pt-20 pb-16">
+        <div class="text-center pt-8 pb-16">
           <div class="mb-8">
             <div class="inline-flex items-center justify-center w-24 h-24 bg-white bg-opacity-20 rounded-full mb-6">
               <i class="fas fa-seedling text-4xl text-white"></i>
             </div>
           </div>
-          <h1 class="text-5xl md:text-6xl font-bold text-white mb-6 hero-text">
+          <h1 class="text-5xl md:text-6xl font-bold mb-6 hero-text animated-title">
             智慧农业溯源系统
           </h1>
-          <p class="text-xl md:text-2xl text-green-100 mb-8 max-w-3xl mx-auto leading-relaxed">
+          <p class="text-xl md:text-2xl mb-8 max-w-3xl mx-auto leading-relaxed animated-subtitle">
             从田间到餐桌，全程透明可追溯<br>
             让每一粒稻米都有自己的身份证
           </p>
-          <div class="flex flex-wrap justify-center gap-4 text-green-100">
-            <span 
-              v-for="feature in features" 
-              :key="feature.text"
-              class="inline-flex items-center gap-2 bg-white bg-opacity-20 px-4 py-2 rounded-full"
-            >
-              <i :class="feature.icon"></i>
-              {{ feature.text }}
-            </span>
-          </div>
         </div>
 
         <!-- 系统数据统计 -->
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-20">
-          <StatsCard 
-            v-for="stat in stats" 
+        <div class="flex flex-wrap justify-center gap-4 mb-20">
+          <div 
+            v-for="(stat, index) in stats" 
             :key="stat.label"
-            :number="stat.number"
-            :label="stat.label"
-          />
+            :class="['stats-card', `stats-card-${index + 1}`]"
+          >
+            <div class="text-2xl font-bold mb-1">{{ stat.number }}</div>
+            <div class="text-sm opacity-80">{{ stat.label }}</div>
+          </div>
         </div>
 
         <!-- 用户角色选择 -->
@@ -48,28 +40,21 @@
           <h2 class="text-3xl font-bold text-white mb-4">选择您的身份</h2>
           <p class="text-green-100 mb-12 text-lg">不同角色，专属体验</p>
           
-          <div class="flex flex-col md:flex-row items-center justify-center gap-8">
-            <RoleButton
+          <div class="flex flex-col md:flex-row items-center justify-center gap-6">
+            <button
               v-for="role in roles"
               :key="role.name"
-              :icon="role.icon"
-              :label="role.label"
-              :variant="role.variant"
+              :class="['role-btn', `role-btn-${role.variant}`]"
               @click="navigateToRole(role.route)"
-            />
+            >
+              <i :class="[role.icon, 'text-xl mr-2']"></i>
+              {{ role.label }}
+            </button>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- 系统特色功能 -->
-    <FeatureSection />
-
-    <!-- 系统工作流程 -->
-    <WorkflowSection />
-
-    <!-- 联系我们 -->
-    <ContactSection />
 
     <!-- 页脚 -->
     <footer class="bg-gray-900 text-white py-8">
@@ -91,21 +76,9 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import StatsCard from '@/components/homepage/StatsCard.vue'
-import RoleButton from '@/components/homepage/RoleButton.vue'
-import FeatureSection from '@/components/homepage/FeatureSection.vue'
-import WorkflowSection from '@/components/homepage/WorkflowSection.vue'
-import ContactSection from '@/components/homepage/ContactSection.vue'
 
 const router = useRouter()
 
-// 功能特色
-const features = ref([
-  { icon: 'fas fa-shield-alt', text: '安全可信' },
-  { icon: 'fas fa-eye', text: '全程透明' },
-  { icon: 'fas fa-users', text: '多方协作' },
-  { icon: 'fas fa-mobile-alt', text: '一键溯源' }
-])
 
 // 统计数据
 const stats = ref([
@@ -203,6 +176,143 @@ onMounted(() => {
   50% { transform: translateY(-20px); }
 }
 
+/* 标题动画效果 */
+.animated-title {
+  background: linear-gradient(45deg, #ffffff, #fef3c7, #fbbf24, #ffffff);
+  background-size: 300% 300%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: breathing-title 4s ease-in-out infinite;
+  text-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.animated-subtitle {
+  background: linear-gradient(45deg, #ecfccb, #d9f99d, #bef264, #ecfccb);
+  background-size: 300% 300%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: breathing-subtitle 5s ease-in-out infinite;
+}
+
+@keyframes breathing-title {
+  0%, 100% { 
+    background-position: 0% 50%;
+    transform: scale(1);
+  }
+  50% { 
+    background-position: 100% 50%;
+    transform: scale(1.02);
+  }
+}
+
+@keyframes breathing-subtitle {
+  0%, 100% { 
+    background-position: 0% 50%;
+  }
+  50% { 
+    background-position: 100% 50%;
+  }
+}
+
+/* 特色标签样式 */
+.feature-badge {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.1));
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  transition: all 0.3s ease;
+}
+
+.feature-badge:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+}
+
+/* 统计卡片样式 - Apple风格 */
+.stats-card {
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(20px);
+  border-radius: 24px;
+  padding: 20px 24px;
+  text-align: center;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease;
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.1),
+    0 2px 8px rgba(0, 0, 0, 0.05);
+  min-width: 140px;
+  width: auto;
+  white-space: nowrap;
+  margin-bottom:10px;
+  margin-left: 10%;
+  margin-right:10%;
+}
+
+.stats-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 
+    0 16px 48px rgba(0, 0, 0, 0.15),
+    0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.stats-card-1 {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(147, 197, 253, 0.1));
+  color: #1e40af;
+}
+
+.stats-card-2 {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(110, 231, 183, 0.1));
+  color: #065f46;
+}
+
+.stats-card-3 {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(252, 211, 77, 0.1));
+  color: #92400e;
+}
+
+.stats-card-4 {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(196, 181, 253, 0.1));
+  color: #5b21b6;
+}
+
+/* 角色按钮样式 */
+.role-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px 32px;
+  border-radius: 16px;
+  border: none;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  min-width: 160px;
+  margin: 30px;
+}
+
+.role-btn-buyer {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.8), rgba(147, 197, 253, 0.6));
+}
+
+.role-btn-farmer {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.8), rgba(110, 231, 183, 0.6));
+}
+
+.role-btn-admin {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.8), rgba(196, 181, 253, 0.6));
+}
+
+.role-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
+}
+
 .hero-text {
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
@@ -221,8 +331,19 @@ onMounted(() => {
     font-size: 1.125rem;
   }
   
-  .pt-20 {
-    padding-top: 3rem;
+  .pt-8 {
+    padding-top: 2rem;
+  }
+  
+  .stats-card {
+    padding: 16px 20px;
+    min-width: 120px;
+  }
+  
+  .role-btn {
+    padding: 12px 24px;
+    font-size: 16px;
+    min-width: 140px;
   }
 }
 </style>
