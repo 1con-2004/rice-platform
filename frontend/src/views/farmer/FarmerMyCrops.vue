@@ -108,7 +108,6 @@ import TimelineItem from '@/components/common/TimelineItem.vue'
 const router = useRouter()
 
 // 响应式数据
-const showMenuModal = ref(false)
 const loadingMore = ref(false)
 const isAscending = ref(true)
 
@@ -138,12 +137,6 @@ const navItems = [
     route: 'FarmerMessages'
   }
 ]
-
-
-// 关闭菜单
-const closeMenu = () => {
-  showMenuModal.value = false
-}
 
 // 加载更多
 const loadMore = () => {

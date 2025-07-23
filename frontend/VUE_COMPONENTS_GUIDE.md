@@ -594,28 +594,28 @@ VITE_APP_TITLE=智慧农业溯源系统
 
 ### 常见错误分析
 
-#### 1. StatusBar 组件错误
-**错误原因：** 文档描述了不存在的 StatusBar 组件
-- **问题：** 原型图中的状态栏HTML被误认为需要组件化
-- **解决：** 如需状态栏，直接使用HTML结构，不需要专门的组件
+#### 1. iOS状态栏使用说明
+**重要说明：** 项目中不使用iOS状态栏
+- **原则：** 无论原型图中是否包含iOS状态栏，实际开发中都不需要实现
+- **原因：** 避免与真实设备状态栏冲突，简化界面设计
+- **处理方式：** 直接从顶部导航栏开始布局
 
-```html
-<!-- 正确方式：直接使用HTML -->
-<div class="status-bar">
-  <div class="status-left">
-    <span>9:41</span>
+```vue
+<!-- ✅ 正确方式：不使用状态栏，直接从导航栏开始 -->
+<template>
+  <div class="page-container">
+    <TopNav title="页面标题" />
+    <!-- 页面内容 -->
   </div>
-  <div class="status-right">
-    <i class="fas fa-signal text-sm"></i>
-    <i class="fas fa-wifi text-sm"></i>
-    <div class="battery">
-      <div class="battery-level"></div>
-    </div>
-  </div>
-</div>
+</template>
 
-<!-- ❌ 错误方式：使用不存在的组件 -->
-<StatusBar />
+<!-- ❌ 错误方式：添加iOS状态栏 -->
+<template>
+  <div class="page-container">
+    <div class="status-bar">...</div> <!-- 不要添加 -->
+    <TopNav title="页面标题" />
+  </div>
+</template>
 ```
 
 #### 2. TimelineItem 组件接口错误
@@ -666,6 +666,7 @@ cat src/components/common/ComponentName.vue
 2. **分析组件接口**：通过读取组件源码了解真实的props和事件
 3. **避免基于文档假设**：文档可能过时，以实际代码为准
 4. **原型图转换原则**：原型图是设计参考，不是组件使用指南
+5. **iOS状态栏处理**：无论原型图是否包含，都不要在实际代码中实现iOS状态栏
 
 **对于开发者：**
 1. **定期更新文档**：确保文档与实际代码同步
@@ -678,6 +679,12 @@ cat src/components/common/ComponentName.vue
 - **❌ 文档不应包含：** 不存在的组件、错误的接口定义、过时的使用方式
 
 ### 更新记录
+
+**2024-07-23 - 重要更新**
+- 明确说明项目中不使用iOS状态栏
+- 更新了页面布局指导原则
+- 添加了AI助手的状态栏处理规范
+- 强调原型图与实际实现的差异处理
 
 **2024-07-22 - 重要更新**
 - 移除了不存在的 StatusBar 组件描述

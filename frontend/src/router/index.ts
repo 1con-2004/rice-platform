@@ -9,6 +9,7 @@ import FarmerLogin from '@/views/farmer/FarmerLogin.vue'
 import FarmerMyCrops from '@/views/farmer/FarmerMyCrops.vue'
 import FarmerPublish from '@/views/farmer/FarmerPublish.vue'
 import FarmerMessages from '@/views/farmer/FarmerMessages.vue'
+import FarmerMessageDetail from '@/views/farmer/FarmerMessageDetail.vue'
 import FarmerSettings from '@/views/farmer/FarmerSettings.vue'
 
 // 买家端路由
@@ -57,6 +58,12 @@ const routes: Array<RouteRecordRaw> = [
         name: 'FarmerMessages',
         component: FarmerMessages,
         meta: { title: '消息中心', requiresAuth: true }
+      },
+      {
+        path: 'messages/:messageId',
+        name: 'FarmerMessageDetail',
+        component: FarmerMessageDetail,
+        meta: { title: '消息详情', requiresAuth: true }
       },
       {
         path: 'settings',
