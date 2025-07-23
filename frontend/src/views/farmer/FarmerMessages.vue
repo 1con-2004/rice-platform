@@ -23,8 +23,7 @@
 
     <!-- 消息列表 -->
     <div class="px-4 pb-32">
-      <h3 class="text-2xl font-bold text-green-800 mb-6 px-2">最新消息</h3>
-
+      <h3 class="text-2xl font-bold text-green-800 mb-6 messages-title">最新消息</h3>
       <!-- 买家提问消息 -->
       <div 
         v-for="message in messages" 
@@ -434,6 +433,11 @@ onMounted(async () => {
 </script>
 
 <style scoped>
+/* 标题样式 */
+.messages-title {
+  margin-left: 32px !important;
+}
+
 /* 消息卡片样式 */
 .message-item {
   background: white;
@@ -602,7 +606,7 @@ onMounted(async () => {
 /* 响应式设计优化 */
 @media (max-width: 768px) {
   .message-overview-card {
-    margin: 0 -8px;
+    margin: 30px;
     padding: 24px 20px;
     border-radius: 16px;
   }
