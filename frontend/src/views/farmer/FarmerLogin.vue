@@ -116,13 +116,6 @@
       </div>
     </div>
 
-    <!-- 语音提示区域 -->
-    <div class="voice-hint" :class="{ visible: showVoiceHint }">
-      <div class="voice-content">
-        <i class="fas fa-volume-up text-blue-600 mr-3"></i>
-        <p class="hint-text">{{ hintText }}</p>
-      </div>
-    </div>
 
     <!-- 操作成功提示 -->
     <BaseModal
@@ -145,17 +138,19 @@
 
 <script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import FormInput from '@/components/common/FormInput.vue'
 import BaseButton from '@/components/common/BaseButton.vue'
 import BaseModal from '@/components/common/BaseModal.vue'
+
+// 路由
+const router = useRouter()
 
 // 响应式数据
 const isLogin = ref(true)
 const loginLoading = ref(false)
 const registerLoading = ref(false)
 const showSuccessModal = ref(false)
-const showVoiceHint = ref(false)
-const hintText = ref('')
 const successText = ref('')
 
 // 表单数据
@@ -182,19 +177,6 @@ const registerErrors = reactive({
   confirmPassword: ''
 })
 
-// 显示语音提示
-const showVoiceHintMsg = (text: string) => {
-  hintText.value = text
-  showVoiceHint.value = true
-  
-  // 语音播报
-  if ('speechSynthesis' in window) {
-    const utterance = new SpeechSynthesisUtterance(text)
-    utterance.lang = 'zh-CN'
-    utterance.rate = 0.8
-    speechSynthesis.speak(utterance)
-  }
-}
 
 // 显示成功提示
 const showSuccess = (text: string) => {
@@ -211,14 +193,12 @@ const closeModal = () => {
 const showRegister = () => {
   isLogin.value = false
   clearErrors()
-  showVoiceHintMsg('请填写注册信息')
 }
 
 // 切换到登录
 const showLogin = () => {
   isLogin.value = true
   clearErrors()
-  showVoiceHintMsg('请输入您的账号和密码')
 }
 
 // 清空错误信息
@@ -237,18 +217,15 @@ const handleLogin = async () => {
   
   if (!loginForm.account) {
     loginErrors.account = '请输入账号'
-    showVoiceHintMsg('请先输入账号哦')
     return
   }
   
   if (!loginForm.password) {
     loginErrors.password = '请输入密码'
-    showVoiceHintMsg('请先输入密码哦')
     return
   }
   
   loginLoading.value = true
-  showVoiceHintMsg('正在登录，请稍候...')
   
   try {
     const response = await fetch('http://localhost:3001/api/auth/login', {
@@ -265,7 +242,6 @@ const handleLogin = async () => {
     // 检查网络请求是否成功
     if (!response.ok) {
       const errorData = await response.json()
-      showVoiceHintMsg(errorData.message || '登录失败，请重试')
       return
     }
     
@@ -279,17 +255,14 @@ const handleLogin = async () => {
       showSuccess('登录成功，正在进入系统...')
       setTimeout(() => {
         closeModal()
-        showVoiceHintMsg('登录成功，欢迎回来！')
-        // 这里可以跳转到其他页面
-        // router.push('/farmer/dashboard')
+        // 跳转到消息页面
+        router.push('/farmer/messages')
       }, 2000)
     } else {
-      showVoiceHintMsg(result.message || '登录失败，请重试')
     }
     
   } catch (error) {
     console.error('登录请求失败:', error)
-    showVoiceHintMsg('网络连接失败，请检查网络后重试')
   } finally {
     loginLoading.value = false
   }
@@ -301,24 +274,20 @@ const handleRegister = async () => {
   
   if (!registerForm.account) {
     registerErrors.account = '请输入账号'
-    showVoiceHintMsg('请先输入账号哦')
     return
   }
   
   if (!registerForm.password) {
     registerErrors.password = '请输入密码'
-    showVoiceHintMsg('请先设置密码哦')
     return
   }
   
   if (registerForm.password !== registerForm.confirmPassword) {
     registerErrors.confirmPassword = '两次密码不一致'
-    showVoiceHintMsg('两次密码不一样，请重新输入')
     return
   }
   
   registerLoading.value = true
-  showVoiceHintMsg('正在注册，请稍候...')
   
   try {
     const response = await fetch('http://localhost:3001/api/auth/register', {
@@ -336,7 +305,6 @@ const handleRegister = async () => {
     // 检查网络请求是否成功
     if (!response.ok) {
       const errorData = await response.json()
-      showVoiceHintMsg(errorData.message || '注册失败，请重试')
       return
     }
     
@@ -347,19 +315,16 @@ const handleRegister = async () => {
       setTimeout(() => {
         closeModal()
         showLogin()
-        showVoiceHintMsg('注册成功，请登录')
         // 清空注册表单
         registerForm.account = ''
         registerForm.password = ''
         registerForm.confirmPassword = ''
       }, 2000)
     } else {
-      showVoiceHintMsg(result.message || '注册失败，请重试')
     }
     
   } catch (error) {
     console.error('注册请求失败:', error)
-    showVoiceHintMsg('网络连接失败，请检查网络后重试')
   } finally {
     registerLoading.value = false
   }
@@ -367,13 +332,11 @@ const handleRegister = async () => {
 
 // 忘记密码
 const forgotPassword = () => {
-  showVoiceHintMsg('请联系客服帮助找回密码：400-123-4567')
 }
 
 // 页面初始化
 onMounted(() => {
   setTimeout(() => {
-    showVoiceHintMsg('欢迎使用智慧农业溯源系统')
   }, 1000)
 })
 </script>
@@ -487,36 +450,6 @@ onMounted(() => {
   color: #4b5563;
 }
 
-/* 语音提示区域 */
-.voice-hint {
-  position: fixed;
-  bottom: 6rem;
-  left: 1rem;
-  right: 1rem;
-  background: #dbeafe;
-  border: 1px solid #93c5fd;
-  border-radius: 0.75rem;
-  padding: 1rem;
-  transform: translateY(100%);
-  transition: transform 0.3s ease;
-  z-index: 10;
-}
-
-.voice-hint.visible {
-  transform: translateY(0);
-}
-
-.voice-content {
-  display: flex;
-  align-items: center;
-}
-
-.hint-text {
-  color: #1e40af;
-  font-size: 1.125rem;
-  font-weight: 500;
-  margin: 0;
-}
 
 /* 成功模态框 */
 .success-modal {

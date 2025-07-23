@@ -40,19 +40,17 @@ src/
 
 ### 1. 通用组件 (src/components/common/)
 
-#### StatusBar.vue - iOS状态栏组件
-```vue
-<template>
-  <StatusBar />
-</template>
-```
+**⚠️ 注意：以下是项目中实际存在的组件列表，请务必按照实际组件接口使用：**
+- BaseButton.vue
+- BaseModal.vue
+- BottomNav.vue
+- FormInput.vue
+- LoadingSpinner.vue
+- TimelineItem.vue
+- TopNav.vue
 
-**功能特性：**
-- 自动更新时间显示
-- 模拟iOS状态栏外观
-- 电池电量指示器
-
-**使用场景：** 所有移动端页面的顶部
+**❌ 不存在的组件：**
+- StatusBar.vue（文档错误，实际项目中不存在此组件）
 
 #### TopNav.vue - 顶部导航栏
 ```vue
@@ -185,6 +183,8 @@ const navItems = [
 - `closeOnOverlay` (boolean) - 点击遮罩是否关闭
 
 #### TimelineItem.vue - 时间线项目
+**⚠️ 实际组件接口（根据代码分析更新）：**
+
 ```vue
 <template>
   <TimelineItem
@@ -210,15 +210,32 @@ const navItems = [
 </template>
 ```
 
+**实际支持的 Props（经过验证）：**
+- `date` (Date | string) - 时间，必填
+- `title` (string, 可选) - 标题
+- `description` (string, 可选) - 描述文本
+- `image` (string, 可选) - 图片URL
+- `tags` (string[], 默认空数组) - 标签数组
+- `metadata` (Record<string, any>, 可选) - 元数据对象
+- `actions` (boolean, 默认false) - 是否显示操作区域
+
+**事件：**
+- `image-click` - 图片点击事件，参数为图片URL
+
+**❌ 不支持的 Props（文档错误）：**
+- `time` - 不存在此prop，时间通过date计算
+- `date-class` - 不支持自定义日期样式类
+- `title-class` - 不支持自定义标题样式类
+- `tag-class` - 不支持自定义标签样式类
+
 ### 2. 页面组件架构
 
 #### 农民端页面 (src/views/farmer/)
 
 **FarmerLogin.vue - 农民登录页面**
 - 双表单切换（登录/注册）
-- 适老化设计（大字体、语音提示）
+- 适老化设计（大字体）
 - 表单验证和错误处理
-- 语音播报功能
 - 帮助和客服集成
 
 **FarmerMyCrops.vue - 我的作物管理**
@@ -442,20 +459,16 @@ const emit = defineEmits<{
 1. **大字体：** 最小字体16px，重要内容18px+
 2. **高对比度：** 确保文字和背景对比度符合WCAG标准
 3. **大按钮：** 最小触控区域60px×60px
-4. **语音提示：** 关键操作提供语音反馈
+4. **操作提示：** 关键操作提供清晰的视觉反馈
 5. **简化操作：** 减少操作步骤，提供明确指引
 
 ### 实现示例
 
 ```typescript
-// 语音播报功能
-const announceVoice = (text: string) => {
-  if ('speechSynthesis' in window) {
-    const utterance = new SpeechSynthesisUtterance(text)
-    utterance.lang = 'zh-CN'
-    utterance.rate = 0.8
-    speechSynthesis.speak(utterance)
-  }
+// 操作反馈功能
+const showFeedback = (text: string) => {
+  // 显示操作反馈信息
+  console.log(text)
 }
 ```
 
@@ -577,4 +590,99 @@ VITE_APP_TITLE=智慧农业溯源系统
 请帮我设计组件结构和实现方案。
 ```
 
-通过这种详细的指南，开发团队和AI助手都能更好地理解和维护这个Vue 3项目，确保代码质量和项目的可持续发展。
+## ⚠️ 重要更新：组件使用错误总结与最佳实践
+
+### 常见错误分析
+
+#### 1. StatusBar 组件错误
+**错误原因：** 文档描述了不存在的 StatusBar 组件
+- **问题：** 原型图中的状态栏HTML被误认为需要组件化
+- **解决：** 如需状态栏，直接使用HTML结构，不需要专门的组件
+
+```html
+<!-- 正确方式：直接使用HTML -->
+<div class="status-bar">
+  <div class="status-left">
+    <span>9:41</span>
+  </div>
+  <div class="status-right">
+    <i class="fas fa-signal text-sm"></i>
+    <i class="fas fa-wifi text-sm"></i>
+    <div class="battery">
+      <div class="battery-level"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ❌ 错误方式：使用不存在的组件 -->
+<StatusBar />
+```
+
+#### 2. TimelineItem 组件接口错误
+**错误原因：** 文档中描述的props与实际组件不匹配
+- **问题：** 使用了不存在的 `time`、`date-class` 等props
+- **解决：** 严格按照实际组件接口使用
+
+```vue
+<!-- ✅ 正确方式 -->
+<TimelineItem
+  :date="new Date('2024-07-22')"
+  title="生长记录"
+  description="描述文本"
+  :image="imageUrl"
+  :tags="['标签1', '标签2']"
+  @image-click="handleImageClick"
+/>
+
+<!-- ❌ 错误方式 -->
+<TimelineItem
+  :date="new Date('2024-07-22')"
+  title="生长记录"
+  time="今天 09:30"
+  description="描述文本"
+  date-class="bg-red-100 text-red-600"
+  title-class="text-red-600"
+  tag-class="bg-red-100 text-red-600"
+/>
+```
+
+### 最佳实践
+
+#### 1. 组件验证流程
+在使用任何组件之前，请按以下步骤验证：
+
+```bash
+# 1. 检查组件是否存在
+ls src/components/common/ComponentName.vue
+
+# 2. 查看组件实际接口
+cat src/components/common/ComponentName.vue
+```
+
+#### 2. AI辅助开发指导原则
+
+**对于AI助手：**
+1. **优先检查实际代码**：使用 `LS` 和 `Read` 工具验证组件存在性
+2. **分析组件接口**：通过读取组件源码了解真实的props和事件
+3. **避免基于文档假设**：文档可能过时，以实际代码为准
+4. **原型图转换原则**：原型图是设计参考，不是组件使用指南
+
+**对于开发者：**
+1. **定期更新文档**：确保文档与实际代码同步
+2. **代码审查**：检查组件使用是否正确
+3. **类型检查**：使用TypeScript确保组件接口正确
+
+#### 3. 文档维护规范
+
+- **✅ 文档应包含：** 实际存在的组件、正确的props接口、真实的使用示例
+- **❌ 文档不应包含：** 不存在的组件、错误的接口定义、过时的使用方式
+
+### 更新记录
+
+**2024-07-22 - 重要更新**
+- 移除了不存在的 StatusBar 组件描述
+- 更正了 TimelineItem 组件的props接口
+- 添加了组件验证流程
+- 增加了错误分析和最佳实践
+
+通过这种详细的指南和错误总结，开发团队和AI助手都能更好地理解和维护这个Vue 3项目，避免类似错误，确保代码质量和项目的可持续发展。
