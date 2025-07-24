@@ -127,7 +127,6 @@
       :class="{ 'hidden': !showVoiceHint }"
     >
       <div class="bg-blue-100 border border-blue-300 rounded-lg p-4 flex items-center">
-        <p class="text-blue-800 text-lg font-medium">{{ voiceHintText }}</p>
       </div>
     </div>
 

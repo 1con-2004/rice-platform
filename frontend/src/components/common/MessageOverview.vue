@@ -111,8 +111,8 @@ defineProps<Props>()
 /* 响应式设计 */
 @media (max-width: 480px) {
   .message-overview-card {
-    margin: 0 6px 10px 6px;
-    padding: 14px;
+    margin: 0;
+    padding: 16px;
   }
   
   .overview-title {

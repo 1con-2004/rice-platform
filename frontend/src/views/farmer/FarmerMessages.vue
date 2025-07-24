@@ -443,7 +443,7 @@ onMounted(async () => {
   background: white;
   border-radius: 12px;
   padding: 16px;
-  margin: 0 32px 32px 32px;
+  margin: 3rem;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
   border-left: 4px solid transparent;
   transition: all 0.2s ease;
@@ -597,7 +597,7 @@ onMounted(async () => {
   font-weight: 500;
 }
 
-/* 页面胼景色 */
+/* 页面背景色 */
 .farmer-messages {
   background-color: #f0fdf4; /* 淡绿色背景 */
   padding-bottom: env(safe-area-inset-bottom, 0px);
@@ -647,7 +647,7 @@ onMounted(async () => {
   
   .message-item {
     padding: 14px;
-    margin: 0 6px 10px 6px;
+    margin: 2rem;  
     border-radius: 12px;
   }
   
