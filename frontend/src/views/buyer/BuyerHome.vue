@@ -135,14 +135,15 @@
 
       <!-- Load More Button -->
       <div class="load-more-section">
-        <BaseButton
-          label="查看更多作物"
-          variant="primary"
-          size="large"
-          icon="fas fa-chevron-down"
-          :loading="loadingMore"
+        <button
+          class="load-more-btn"
+          :disabled="loadingMore"
           @click="loadMore"
-        />
+        >
+          <i v-if="!loadingMore" class="fas fa-chevron-down mr-2"></i>
+          <i v-if="loadingMore" class="fas fa-spinner fa-spin mr-2"></i>
+          {{ loadingMore ? '加载中...' : '查看更多作物' }}
+        </button>
       </div>
 
       <!-- Registration Prompt -->
@@ -741,6 +742,59 @@ onUnmounted(() => {
   margin: 32px 0;
 }
 
+.load-more-btn {
+  background: #4ade80;
+  background: linear-gradient(135deg, #4ade80, #22c55e, #16a34a);
+  color: white;
+  border: none;
+  border-radius: 50px;
+  padding: 16px 32px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(74, 222, 128, 0.3);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 200px;
+  position: relative;
+  overflow: hidden;
+}
+
+.load-more-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(74, 222, 128, 0.4);
+  background: linear-gradient(135deg, #22c55e, #16a34a, #15803d);
+}
+
+.load-more-btn:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 4px 12px rgba(74, 222, 128, 0.3);
+}
+
+.load-more-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: 0 4px 12px rgba(74, 222, 128, 0.2);
+}
+
+.load-more-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition: left 0.5s;
+}
+
+.load-more-btn:hover:not(:disabled)::before {
+  left: 100%;
+}
+
 /* Registration Prompt */
 .registration-prompt {
   background: white;
@@ -846,5 +900,20 @@ onUnmounted(() => {
     flex-direction: column;
     align-items: flex-start;
     gap: 4px;
+  }
+  
+  .load-more-btn {
+    padding: 14px 28px;
+    font-size: 15px;
+    min-width: 180px;
+  }
+}
+
+@media (max-width: 480px) {
+  .load-more-btn {
+    padding: 12px 24px;
+    font-size: 14px;
+    min-width: 160px;
+    border-radius: 40px;
   }
 }</style>
