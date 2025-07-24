@@ -18,7 +18,7 @@
       </div>
       <div class="text-center text-gray-500 text-sm my-4">2小时前</div>
 
-      <!-- 农民回复（如果有的话） -->
+      <!-- 农户回复（如果有的话） -->
       <div v-if="replies.length > 0">
         <div 
           v-for="reply in replies" 

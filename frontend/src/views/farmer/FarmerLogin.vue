@@ -13,7 +13,7 @@
     <div class="form-container">
       <!-- 登录表单 -->
       <div v-show="isLogin" class="form-card">
-        <h2 class="title-elderly">农民登录</h2>
+        <h2 class="title-elderly">农户登录</h2>
         
         <div class="form-group">
           <FormInput
@@ -62,7 +62,7 @@
 
       <!-- 注册表单 -->
       <div v-show="!isLogin" class="form-card">
-        <h2 class="title-elderly">农民注册</h2>
+        <h2 class="title-elderly">农户注册</h2>
         
         <div class="form-group">
           <FormInput

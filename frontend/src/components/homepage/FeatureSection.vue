@@ -41,7 +41,7 @@ const features = ref([
     icon: 'fas fa-comments',
     iconColor: 'text-purple-600',
     title: '社交互动功能',
-    description: '农民与消费者直接沟通，分享种植心得，增进信任关系'
+    description: '农户与消费者直接沟通，分享种植心得，增进信任关系'
   },
   {
     icon: 'fas fa-shield-alt',
@@ -53,7 +53,7 @@ const features = ref([
     icon: 'fas fa-mobile-alt',
     iconColor: 'text-yellow-600',
     title: '适老化设计',
-    description: '大字体、简单操作，让年长的农民也能轻松使用系统记录信息'
+    description: '大字体、简单操作，让年长的农户也能轻松使用系统记录信息'
   },
   {
     icon: 'fas fa-chart-bar',

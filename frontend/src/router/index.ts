@@ -4,7 +4,7 @@ import type { RouteRecordRaw } from 'vue-router'
 // 导入视图组件
 import HomePage from '@/views/HomePage.vue'
 
-// 农民端路由
+// 农户端路由
 import FarmerLogin from '@/views/farmer/FarmerLogin.vue'
 import FarmerMyCrops from '@/views/farmer/FarmerMyCrops.vue'
 import FarmerPublish from '@/views/farmer/FarmerPublish.vue'
@@ -31,7 +31,7 @@ const routes: Array<RouteRecordRaw> = [
     meta: { title: '智慧农业溯源系统' }
   },
   
-  // 农民端路由
+  // 农户端路由
   {
     path: '/farmer',
     children: [
@@ -39,7 +39,7 @@ const routes: Array<RouteRecordRaw> = [
         path: 'login',
         name: 'FarmerLogin',
         component: FarmerLogin,
-        meta: { title: '农民登录' }
+        meta: { title: '农户登录' }
       },
       {
         path: 'my-crops',

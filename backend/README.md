@@ -1,7 +1,7 @@
 # Rice Platform Backend API
 
 ## 项目简介
-智慧农业溯源平台的后端API服务，提供农民用户的注册和登录功能。
+智慧农业溯源平台的后端API服务，提供农户用户的注册和登录功能。
 
 ## 技术栈
 - Node.js + TypeScript
@@ -22,7 +22,7 @@ backend/
 │   ├── middleware/
 │   │   └── auth.ts              # JWT认证中间件
 │   ├── models/
-│   │   └── Farmer.ts            # 农民用户模型
+│   │   └── Farmer.ts            # 农户用户模型
 │   ├── routes/
 │   │   └── authRoutes.ts        # 认证路由
 │   ├── tests/

@@ -23,7 +23,7 @@ src/
 │   ├── homepage/       # 首页专用组件
 │   └── prototype/      # 原型展示组件
 ├── views/              # 页面组件
-│   ├── farmer/         # 农民端页面
+│   ├── farmer/         # 农户端页面
 │   ├── buyer/          # 买家端页面
 │   └── admin/          # 管理端页面
 ├── styles/             # 样式文件
@@ -230,9 +230,9 @@ const navItems = [
 
 ### 2. 页面组件架构
 
-#### 农民端页面 (src/views/farmer/)
+#### 农户端页面 (src/views/farmer/)
 
-**FarmerLogin.vue - 农民登录页面**
+**FarmerLogin.vue - 农户登录页面**
 - 双表单切换（登录/注册）
 - 适老化设计（大字体）
 - 表单验证和错误处理
@@ -275,7 +275,7 @@ const navItems = [
 - 时间线展示
 - 日历视图
 - 评论系统
-- 农民信息
+- 农户信息
 
 **BuyerSearch.vue - 搜索页面**
 - 高级筛选
@@ -301,7 +301,7 @@ const navItems = [
 - 内容列表
 - 审核操作
 - 举报处理
-- 农民沟通
+- 农户沟通
 
 **AdminAnalytics.vue - 数据统计**
 - 数据图表
@@ -571,7 +571,7 @@ VITE_APP_TITLE=智慧农业溯源系统
 ### 示例问询格式
 
 ```
-我需要在农民端添加一个作物健康监测功能：
+我需要在农户端添加一个作物健康监测功能：
 
 1. 功能需求：
    - 显示作物健康状态

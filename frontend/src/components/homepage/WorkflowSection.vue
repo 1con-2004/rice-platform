@@ -33,7 +33,7 @@ const steps = ref([
     icon: 'fas fa-seedling',
     iconColor: 'text-green-600',
     title: '种植记录',
-    description: '农民记录种植信息，包括品种、时间、地点等'
+    description: '农户记录种植信息，包括品种、时间、地点等'
   },
   {
     icon: 'fas fa-camera',
