@@ -99,7 +99,7 @@ const roles = ref([
   },
   { 
     name: 'farmer', 
-    label: '我是农民', 
+    label: '我是农户', 
     icon: 'fas fa-user-friends', 
     variant: 'farmer' as const,
     route: '/farmer/login'
