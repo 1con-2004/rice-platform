@@ -1,26 +1,16 @@
 <template>
   <div class="farmer-my-crops">
 
-    <!-- 顶部导航栏 -->
-    <TopNav 
-      title="我的作物生长记录"
-      :show-back="false"
-    >
-      
-    </TopNav>
-
     <!-- 作物概览卡片 -->
     <div class="p-6">
-      <div class="card bg-gradient-to-r from-green-400 to-green-600 text-white">
-        <div class="flex items-center justify-between">
-          <div>
-            <h2 class="text-white text-2xl font-bold mb-2">我的水稻田</h2>
-            <p class="text-green-100 text-lg">种植第 89 天</p>
-            <p class="text-green-100">已发布 12 条生长记录</p>
-          </div>
-          <div class="w-20 h-20 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
-            <i class="fas fa-leaf text-3xl"></i>
-          </div>
+      <div class="crop-overview-card">
+        <div class="crop-info">
+          <h2 class="crop-title">我的水稻田</h2>
+          <p class="crop-subtitle">种植第 89 天</p>
+          <p class="crop-detail">已发布 12 条生长记录</p>
+        </div>
+        <div class="crop-icon-container">
+          <i class="fas fa-leaf crop-icon"></i>
         </div>
       </div>
     </div>
@@ -100,7 +90,6 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import TopNav from '@/components/common/TopNav.vue'
 import BottomNav from '@/components/common/BottomNav.vue'
 import BaseButton from '@/components/common/BaseButton.vue'
 import TimelineItem from '@/components/common/TimelineItem.vue'
@@ -185,6 +174,88 @@ onMounted(() => {
   min-height: 100vh;
   background: linear-gradient(to bottom, #f0f9f0, #e8f5e8);
   padding-bottom: 5rem;
+}
+
+/* 作物概览卡片样式 */
+.crop-overview-card {
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 50%, #15803d 100%);
+  border-radius: 24px;
+  padding: 2rem;
+  box-shadow: 
+    0 10px 30px rgba(34, 197, 94, 0.3),
+    0 4px 15px rgba(34, 197, 94, 0.2);
+  margin-bottom: 2rem;
+  color: white;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.crop-overview-card::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -30%;
+  width: 200px;
+  height: 200px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.crop-info {
+  flex: 1;
+  z-index: 2;
+  position: relative;
+  margin-right: 1.5rem;
+}
+
+.crop-title {
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: white;
+  margin-bottom: 1rem;
+  letter-spacing: -0.025em;
+  line-height: 1.2;
+}
+
+.crop-subtitle {
+  font-size: 1.25rem;
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 0.75rem;
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+.crop-detail {
+  font-size: 1.125rem;
+  color: rgba(255, 255, 255, 0.85);
+  font-weight: 400;
+  line-height: 1.4;
+}
+
+.crop-icon-container {
+  width: 100px;
+  height: 100px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(10px);
+  border: 3px solid rgba(255, 255, 255, 0.25);
+  z-index: 2;
+  position: relative;
+  flex-shrink: 0;
+  margin-top: 0.5rem;
+}
+
+.crop-icon {
+  font-size: 3rem;
+  color: white;
+  opacity: 0.9;
 }
 
 /* 卡片样式 */

@@ -40,14 +40,14 @@
           <h2 class="text-3xl font-bold text-white mb-4">选择您的身份</h2>
           <p class="text-green-100 mb-12 text-lg">不同角色，专属体验</p>
           
-          <div class="flex flex-col md:flex-row items-center justify-center gap-6">
+          <div class="flex flex-col items-center justify-center gap-4 px-4">
             <button
               v-for="role in roles"
               :key="role.name"
               :class="['role-btn', `role-btn-${role.variant}`]"
               @click="navigateToRole(role.route)"
             >
-              <i :class="[role.icon, 'text-xl mr-2']"></i>
+              <i :class="[role.icon, 'text-2xl mr-3']"></i>
               {{ role.label }}
             </button>
           </div>
@@ -57,14 +57,14 @@
 
 
     <!-- 页脚 -->
-    <footer class="bg-gray-900 text-white py-8">
+    <footer class="footer-gradient text-white py-8">
       <div class="container mx-auto px-6 text-center">
         <div class="flex items-center justify-center mb-4">
-          <i class="fas fa-seedling text-2xl text-green-500 mr-3"></i>
-          <span class="text-xl font-bold">智慧农业溯源系统</span>
+          <i class="fas fa-seedling text-2xl text-green-200 mr-3"></i>
+          <span class="text-xl font-bold text-white">智慧农业溯源系统</span>
         </div>
-        <p class="text-gray-400 mb-4">科技赋能农业，让每一粒稻米都有身份证</p>
-        <div class="text-sm text-gray-500">
+        <p class="text-green-100 mb-4">科技赋能农业，让每一粒稻米都有身份证</p>
+        <div class="text-sm text-green-200">
           <p>© 2024 智慧农业科技有限公司 版权所有</p>
           <p>技术支持：农业大数据平台</p>
         </div>
@@ -161,6 +161,10 @@ onMounted(() => {
 
 <style scoped>
 .hero-gradient {
+  background: linear-gradient(135deg, #059669 0%, #16a34a 50%, #22c55e 100%);
+}
+
+.footer-gradient {
   background: linear-gradient(135deg, #059669 0%, #16a34a 50%, #22c55e 100%);
 }
 
@@ -282,18 +286,21 @@ onMounted(() => {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 16px 32px;
-  border-radius: 16px;
+  padding: 24px 48px;
+  border-radius: 28px;
   border: none;
-  font-size: 18px;
-  font-weight: 600;
+  font-size: 20px;
+  font-weight: 700;
   cursor: pointer;
   transition: all 0.3s ease;
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.2);
   color: white;
-  min-width: 160px;
-  margin: 30px;
+  width: 300px;
+  max-width: 90vw;
+  margin: 0;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+  margin-bottom: 30px;
 }
 
 .role-btn-buyer {
@@ -341,9 +348,11 @@ onMounted(() => {
   }
   
   .role-btn {
-    padding: 12px 24px;
-    font-size: 16px;
-    min-width: 140px;
+    padding: 20px 36px;
+    font-size: 18px;
+    width: 280px;
+    max-width: 85vw;
+    border-radius: 24px;
   }
 }
 </style>

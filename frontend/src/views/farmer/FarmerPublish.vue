@@ -1,10 +1,5 @@
 <template>
   <div class="farmer-publish min-h-screen bg-green-50">
-    <!-- 顶部导航栏 -->
-    <TopNav 
-      title="发布生长动态"
-      :show-back="true"
-    />
 
     <!-- 主内容区域 -->
     <div class="p-6 pb-32">
@@ -154,21 +149,12 @@
       </div>
     </BaseModal>
 
-    <!-- 隐藏的文件输入 -->
-    <input 
-      ref="fileInput"
-      type="file" 
-      accept="image/*" 
-      class="hidden" 
-      @change="handleFileSelect"
-    >
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import TopNav from '@/components/common/TopNav.vue'
 import BottomNav from '@/components/common/BottomNav.vue'
 import BaseButton from '@/components/common/BaseButton.vue'
 import BaseModal from '@/components/common/BaseModal.vue'
@@ -243,31 +229,6 @@ const selectPhoto = () => {
   voiceHintText.value = '正在打开相册'
   fileInput.value?.click()
   hideVoiceHint()
-}
-
-// 处理文件选择
-const handleFileSelect = (event: Event) => {
-  const target = event.target as HTMLInputElement
-  const file = target.files?.[0]
-  
-  if (file) {
-    if (file.size > 10 * 1024 * 1024) { // 10MB限制
-      showVoiceHint.value = true
-      voiceHintText.value = '照片太大了，请选择小一点的照片'
-      hideVoiceHint()
-      return
-    }
-    
-    const reader = new FileReader()
-    reader.onload = (e) => {
-      previewImage.value = e.target?.result as string
-      showPreview.value = true
-      showVoiceHint.value = true
-      voiceHintText.value = '照片已选择，请确认'
-      hideVoiceHint()
-    }
-    reader.readAsDataURL(file)
-  }
 }
 
 // 重新拍摄

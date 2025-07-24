@@ -1,29 +1,48 @@
 <template>
   <div class="farmer-messages min-h-screen">
-    <!-- 顶部导航栏 -->
-    <TopNav 
-      title="消息中心"
-      :show-back="false"
-    >
-      <template #left-icon>
-        <i class="fas fa-comments text-2xl mr-3"></i>
-      </template>
-      <template #actions>
-        <button @click="markAllRead" class="nav-action-btn">
-          一键已读
-        </button>
-      </template>
-    </TopNav>
 
-    <!-- 消息统计 -->
-    <MessageOverview 
-      :unread-count="unreadCount" 
-      :total-count="messages.length" 
-    />
+    <!-- 开发模式切换 - 可以通过修改 isDevelopmentMode 的值来切换 -->
+    <!-- isDevelopmentMode: true = 显示"正在开发中", false = 显示原始功能 -->
+    
+    <div v-if="isDevelopmentMode" class="development-placeholder">
+      <div class="development-content">
+        <div class="development-icon">
+          <i class="fas fa-tools text-6xl text-green-600 mb-6"></i>
+        </div>
+        <h2 class="text-3xl font-bold text-green-800 mb-4">正在开发中</h2>
+        <p class="text-lg text-green-600 mb-6">消息功能正在努力开发中，敬请期待！</p>
+        <div class="development-features">
+          <div class="feature-item">
+            <i class="fas fa-check text-green-500 mr-2"></i>
+            <span>买家提问消息</span>
+          </div>
+          <div class="feature-item">
+            <i class="fas fa-check text-green-500 mr-2"></i>
+            <span>系统通知消息</span>
+          </div>
+          <div class="feature-item">
+            <i class="fas fa-check text-green-500 mr-2"></i>
+            <span>快速回复功能</span>
+          </div>
+          <div class="feature-item">
+            <i class="fas fa-spinner fa-spin text-orange-500 mr-2"></i>
+            <span>更多功能开发中...</span>
+          </div>
+        </div>
+      </div>
+    </div>
 
-    <!-- 消息列表 -->
-    <div class="px-4 pb-32">
-      <h3 class="text-2xl font-bold text-green-800 mb-6 messages-title">最新消息</h3>
+    <!-- 原始功能代码 - 当 isDevelopmentMode 为 false 时显示 -->
+    <template v-else>
+      <!-- 消息统计 -->
+      <MessageOverview 
+        :unread-count="unreadCount" 
+        :total-count="messages.length" 
+      />
+
+      <!-- 消息列表 -->
+      <div class="px-4 pb-32">
+        <h3 class="text-2xl font-bold text-green-800 mb-6 messages-title">最新消息</h3>
       <!-- 买家提问消息 -->
       <div 
         v-for="message in messages" 
@@ -87,10 +106,10 @@
         />
       </div>
     </div>
-
+    </template>
 
     <!-- 操作提示区域 -->
-    <div 
+    <!-- <div 
       class="fixed top-20 left-4 right-4 z-40"
       :class="{ 'hidden': !showVoiceHint }"
       id="hintArea"
@@ -99,23 +118,30 @@
         
         <p class="text-blue-800 text-lg font-medium">{{ voiceHintText }}</p>
       </div>
-    </div>
+    </div> -->
 
-    <!-- 底部导航栏 -->
+        <!-- 底部导航栏 -->
+        <BottomNav :items="navItems" />
+      </div>
+    </template>
+
+    <!-- 底部导航栏 - 在开发模式下也显示 -->
     <BottomNav :items="navItems" />
-  </div>
-</template>
+
 
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
-import TopNav from '@/components/common/TopNav.vue'
 import BottomNav from '@/components/common/BottomNav.vue'
 import BaseButton from '@/components/common/BaseButton.vue'
 import MessageOverview from '@/components/common/MessageOverview.vue'
 
 const router = useRouter()
 
+// 开发模式切换 - 修改这个值来切换显示模式
+// true: 显示"正在开发中"页面
+// false: 显示原始功能
+const isDevelopmentMode = ref(true)
 
 // 消息列表数据（模拟后端接口数据）
 const messages = ref<Message[]>([
@@ -392,26 +418,6 @@ const quickReply = async (message: Message, replyText: string) => {
   }, 2000)
 }
 
-// 标记全部已读
-const markAllRead = async () => {
-  showVoiceHint.value = true
-  voiceHintText.value = '正在标记所有消息为已读...'
-  
-  try {
-    // 模拟 API 调用： PUT /api/farmer/messages/mark-all-read
-    messages.value.forEach(message => {
-      message.read = true
-    })
-    voiceHintText.value = '所有消息已标为已读'
-  } catch (error) {
-    voiceHintText.value = '操作失败，请重试'
-  }
-  
-  setTimeout(() => {
-    showVoiceHint.value = false
-  }, 2000)
-}
-
 // 跳转到发布页面
 const goToPublish = () => {
   router.push({ name: 'FarmerPublish' })
@@ -433,6 +439,53 @@ onMounted(async () => {
 </script>
 
 <style scoped>
+/* 开发模式页面样式 */
+.development-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 160px);
+  padding: 2rem;
+}
+
+.development-content {
+  text-align: center;
+  max-width: 500px;
+  background: white;
+  border-radius: 20px;
+  padding: 3rem 2rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  border: 2px solid #e5f7e5;
+}
+
+.development-icon {
+  margin-bottom: 1rem;
+}
+
+.development-features {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.feature-item {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 0.75rem 1rem;
+  background: #f8fdf8;
+  border-radius: 10px;
+  border-left: 4px solid #16a34a;
+  font-size: 1rem;
+  color: #374151;
+}
+
+.feature-item:last-child {
+  border-left-color: #f59e0b;
+  background: #fffdf7;
+}
+
 /* 标题样式 */
 .messages-title {
   margin-left: 32px !important;
