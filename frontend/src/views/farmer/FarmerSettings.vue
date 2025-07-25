@@ -11,8 +11,8 @@
             <p class="user-detail">注册于 {{ formatDate(userInfo.created_at) }}</p>
           </div>
           <div class="user-icon-container">
-            <el-avatar :size="80" class="user-avatar">
-              <el-icon :size="40"><User /></el-icon>
+            <el-avatar :size="80" class="user-avatar" :src="farmerProfile.avatar_url">
+              <el-icon v-if="!farmerProfile.avatar_url" :size="40"><User /></el-icon>
             </el-avatar>
           </div>
         </div>
@@ -191,18 +191,38 @@
     >
       <el-form :model="editForm" label-width="80px" size="large">
         <el-form-item :label="editFieldLabel">
+          <!-- 头像上传 -->
+          <div v-if="editField === 'avatar_url'" class="avatar-upload-container">
+            <el-upload
+              class="avatar-uploader"
+              action="#"
+              :show-file-list="false"
+              :before-upload="beforeAvatarUpload"
+              :on-success="handleAvatarSuccess"
+              :on-change="handleAvatarChange"
+              :auto-upload="false"
+            >
+              <img v-if="editValue" :src="editValue" class="avatar-preview" />
+              <el-icon v-else class="avatar-uploader-icon"><Plus /></el-icon>
+            </el-upload>
+            <div class="upload-tips">
+              <p>支持 JPG、PNG 格式，文件大小不超过 2MB</p>
+            </div>
+          </div>
+          <!-- 文本输入框 -->
           <el-input
-            v-if="editField !== 'address'"
+            v-else-if="editField !== 'farm_description'"
             v-model="editValue"
             :type="getInputType(editField)"
             :placeholder="getPlaceholder(editField)"
             clearable
           />
+          <!-- 多行文本输入框 -->
           <el-input
             v-else
             v-model="editValue"
             type="textarea"
-            :rows="3"
+            :rows="4"
             :placeholder="getPlaceholder(editField)"
           />
         </el-form-item>
@@ -297,7 +317,7 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 import { 
   User, Setting, Message, Calendar, CircleCheck, Grape, 
   Edit, Lock, Key, SwitchButton, InfoFilled, Platform, Clock,
-  Phone, Location, Grid
+  Phone, Location, Grid, Plus
 } from '@element-plus/icons-vue'
 import BottomNav from '@/components/common/BottomNav.vue'
 
@@ -317,23 +337,22 @@ const userInfo = ref({
 const farmerProfile = ref({
   id: 1,
   user_id: 1,
-  name: '张大力',
-  phone: '13812345678',
-  address: '江苏省苏州市吴中区东山镇农业园区',
-  farm_area: '15亩',
-  crops: '水稻、小麦',
-  avatar: '',
+  real_name: '张大力',
+  contact_phone: '13812345678',
+  farm_location: '江苏省苏州市吴中区东山镇农业园区',
+  farm_description: '占地15亩的现代化农场，主要种植优质水稻和小麦，采用生态种植技术，致力于为消费者提供绿色健康的农产品。',
+  avatar_url: '',
   created_at: new Date('2024-01-15'),
   updated_at: new Date('2024-07-20')
 })
 
 // 农户档案配置
 const profileItems = ref([
-  { key: 'name', label: '姓名', icon: User, iconColor: '#3b82f6' },
-  { key: 'phone', label: '联系电话', icon: Phone, iconColor: '#16a34a' },
-  { key: 'address', label: '农场地址', icon: Location, iconColor: '#ef4444' },
-  { key: 'farm_area', label: '农场面积', icon: Grid, iconColor: '#f59e0b' },
-  { key: 'crops', label: '种植作物', icon: Grape, iconColor: '#16a34a' }
+  { key: 'real_name', label: '真实姓名', icon: User, iconColor: '#3b82f6' },
+  { key: 'contact_phone', label: '联系电话', icon: Phone, iconColor: '#16a34a' },
+  { key: 'farm_location', label: '农场地理位置', icon: Location, iconColor: '#ef4444' },
+  { key: 'farm_description', label: '农场详细信息', icon: Grid, iconColor: '#f59e0b' },
+  { key: 'avatar_url', label: '头像图片', icon: User, iconColor: '#8b5cf6' }
 ])
 
 // 弹窗状态
@@ -352,6 +371,9 @@ const passwordForm = ref({})
 const oldPassword = ref('')
 const newPassword = ref('')
 const confirmPassword = ref('')
+
+// 头像上传相关
+const uploadedFile = ref<File | null>(null)
 
 // 底部导航配置 - FarmerSettings页面应该高亮"设置"
 const navItems = [
@@ -385,22 +407,22 @@ const navItems = [
 // 计算属性
 const editModalTitle = computed(() => {
   const fieldNames: Record<string, string> = {
-    name: '编辑姓名',
-    phone: '编辑联系电话',
-    address: '编辑农场地址',
-    farm_area: '编辑农场面积',
-    crops: '编辑种植作物'
+    real_name: '编辑真实姓名',
+    contact_phone: '编辑联系电话',
+    farm_location: '编辑农场地理位置',
+    farm_description: '编辑农场详细信息',
+    avatar_url: '编辑头像图片'
   }
   return fieldNames[editField.value] || '编辑信息'
 })
 
 const editFieldLabel = computed(() => {
   const fieldLabels: Record<string, string> = {
-    name: '姓名',
-    phone: '联系电话',
-    address: '农场地址',
-    farm_area: '农场面积',
-    crops: '种植作物'
+    real_name: '真实姓名',
+    contact_phone: '联系电话',
+    farm_location: '农场地理位置',
+    farm_description: '农场详细信息',
+    avatar_url: '头像图片'
   }
   return fieldLabels[editField.value] || '信息'
 })
@@ -416,18 +438,18 @@ const formatDate = (date: Date) => {
 
 // 获取输入框类型
 const getInputType = (field: string) => {
-  if (field === 'phone') return 'tel'
+  if (field === 'contact_phone') return 'tel'
   return 'text'
 }
 
 // 获取占位符
 const getPlaceholder = (field: string) => {
   const placeholders: Record<string, string> = {
-    name: '请输入您的姓名',
-    phone: '请输入11位手机号码',
-    address: '请输入农场详细地址',
-    farm_area: '请输入农场面积（如：15亩）',
-    crops: '请输入种植作物类型'
+    real_name: '请输入您的真实姓名',
+    contact_phone: '请输入11位手机号码',
+    farm_location: '请输入农场地理位置',
+    farm_description: '请输入农场简介和详细信息',
+    avatar_url: '请上传头像图片'
   }
   return placeholders[field] || '请输入信息'
 }
@@ -447,7 +469,7 @@ const saveProfile = async () => {
   }
   
   // 简单验证
-  if (editField.value === 'phone' && !/^1[3-9]\d{9}$/.test(editValue.value)) {
+  if (editField.value === 'contact_phone' && !/^1[3-9]\d{9}$/.test(editValue.value)) {
     ElMessage.error('请输入正确的手机号码格式')
     return
   }
@@ -458,6 +480,14 @@ const saveProfile = async () => {
     // 模拟异步保存
     await new Promise((resolve) => setTimeout(resolve, 1000))
     
+    // 处理头像上传
+    if (editField.value === 'avatar_url' && uploadedFile.value) {
+      // 在真实项目中，这里应该上传文件到服务器
+      // 现在我们使用本地文件URL作为模拟
+      const localUrl = URL.createObjectURL(uploadedFile.value)
+      editValue.value = localUrl
+    }
+    
     // 模拟保存到数据库
     const profile = farmerProfile.value as any
     profile[editField.value] = editValue.value
@@ -465,6 +495,9 @@ const saveProfile = async () => {
     
     showEditModal.value = false
     ElMessage.success('保存成功！')
+    
+    // 清理上传文件引用
+    uploadedFile.value = null
   } catch (error) {
     ElMessage.error('保存失败，请重试')
   } finally {
@@ -538,8 +571,45 @@ const logout = async () => {
   }
 }
 
+// 头像上传处理
+const beforeAvatarUpload = (file: File) => {
+  const isJPG = file.type === 'image/jpeg' || file.type === 'image/png'
+  const isLt2M = file.size / 1024 / 1024 < 2
+
+  if (!isJPG) {
+    ElMessage.error('头像只能是 JPG 或 PNG 格式!')
+    return false
+  }
+  if (!isLt2M) {
+    ElMessage.error('头像大小不能超过 2MB!')
+    return false
+  }
+  return true
+}
+
+const handleAvatarChange = (file: any) => {
+  if (file.raw) {
+    uploadedFile.value = file.raw
+    // 创建本地预览URL
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      editValue.value = e.target?.result as string
+    }
+    reader.readAsDataURL(file.raw)
+  }
+}
+
+const handleAvatarSuccess = (response: any, file: any) => {
+  // 上传成功后的处理逻辑
+  editValue.value = URL.createObjectURL(file.raw)
+}
+
 // 弹窗关闭处理
 const handleEditClose = (done: () => void) => {
+  // 清理上传的文件
+  if (editField.value === 'avatar_url') {
+    uploadedFile.value = null
+  }
   done()
 }
 
@@ -874,6 +944,62 @@ onMounted(() => {
   }
 }
 
+/* 头像上传组件样式 */
+.avatar-upload-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.avatar-uploader {
+  display: flex;
+  justify-content: center;
+}
+
+:deep(.avatar-uploader .el-upload) {
+  border: 2px dashed #d1d5db;
+  border-radius: 12px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  width: 120px;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+:deep(.avatar-uploader .el-upload:hover) {
+  border-color: #3b82f6;
+  background-color: #f8fafc;
+}
+
+.avatar-uploader-icon {
+  font-size: 28px;
+  color: #8c939d;
+  text-align: center;
+}
+
+.avatar-preview {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.upload-tips {
+  text-align: center;
+}
+
+.upload-tips p {
+  margin: 0;
+  color: #6b7280;
+  font-size: 0.875rem;
+  line-height: 1.4;
+}
+
 /* 响应式设计 */
 @media (max-width: 768px) {
   .user-title {
@@ -903,6 +1029,20 @@ onMounted(() => {
     min-width: 100px !important;
     height: 52px !important;
     font-size: 17px !important;
+  }
+  
+  .avatar-upload-container {
+    width: 100%;
+  }
+  
+  :deep(.avatar-uploader .el-upload) {
+    width: 100px;
+    height: 100px;
+  }
+  
+  .avatar-preview {
+    width: 100px;
+    height: 100px;
   }
   
   :deep(.el-dialog) {
@@ -945,6 +1085,20 @@ onMounted(() => {
   
   .profile-item, .security-item {
     padding: 1rem !important;
+  }
+  
+  :deep(.avatar-uploader .el-upload) {
+    width: 80px;
+    height: 80px;
+  }
+  
+  .avatar-preview {
+    width: 80px;
+    height: 80px;
+  }
+  
+  .upload-tips p {
+    font-size: 0.8rem;
   }
 }
 </style>
