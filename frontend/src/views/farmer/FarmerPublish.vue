@@ -207,6 +207,12 @@ const navItems = [
     label: '消息', 
     icon: 'fas fa-comments', 
     route: 'FarmerMessages'
+  },
+  { 
+    name: 'FarmerSettings', 
+    label: '设置', 
+    icon: 'fas fa-cog', 
+    route: 'FarmerSettings'
   }
 ]
 

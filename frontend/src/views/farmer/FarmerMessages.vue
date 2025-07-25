@@ -339,6 +339,12 @@ const navItems = [
     icon: 'fas fa-comments', 
     route: 'FarmerMessages',
     active: true  // FarmerMessages页面高亮"消息"
+  },
+  { 
+    name: 'FarmerSettings', 
+    label: '设置', 
+    icon: 'fas fa-cog', 
+    route: 'FarmerSettings'
   }
 ]
 
