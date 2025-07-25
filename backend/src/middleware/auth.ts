@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken';
 import { FarmerModel } from '../models/Farmer';
 
 export interface AuthRequest extends Request {
-  farmer?: {
+  user?: {
     id: number;
     account: string;
   };
@@ -25,7 +25,7 @@ export const authenticateToken = async (req: AuthRequest, res: Response, next: N
       return res.status(401).json({ error: '用户不存在或已被禁用' });
     }
 
-    req.farmer = {
+    req.user = {
       id: farmer.id!,
       account: farmer.account
     };

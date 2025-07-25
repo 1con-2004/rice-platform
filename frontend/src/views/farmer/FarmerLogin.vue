@@ -255,8 +255,8 @@ const handleLogin = async () => {
       showSuccess('登录成功，正在进入系统...')
       setTimeout(() => {
         closeModal()
-        // 跳转到消息页面
-        router.push('/farmer/messages')
+        // 跳转到我的作物界面
+        router.push('/farmer/my-crops')
       }, 2000)
     } else {
     }

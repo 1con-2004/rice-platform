@@ -8,10 +8,10 @@
           <div class="user-info">
             <h2 class="user-title">{{ userInfo.account }}</h2>
             <p class="user-subtitle">农户账户</p>
-            <p class="user-detail">注册于 {{ formatDate(userInfo.created_at) }}</p>
+            <p class="user-detail">注册于 {{ userInfo.created_at ? formatDate(userInfo.created_at) : '未知' }}</p>
           </div>
           <div class="user-icon-container">
-            <el-avatar :size="80" class="user-avatar" :src="farmerProfile.avatar_url">
+            <el-avatar :size="80" class="user-avatar" :src="getAvatarUrl(farmerProfile.avatar_url)">
               <el-icon v-if="!farmerProfile.avatar_url" :size="40"><User /></el-icon>
             </el-avatar>
           </div>
@@ -20,7 +20,7 @@
     </div>
 
     <!-- 设置内容区域 -->
-    <div class="px-6 pb-24">
+    <div class="px-6 pb-24" v-loading="loading">
       
       <!-- 账户信息 -->
       <div class="settings-section">
@@ -46,7 +46,7 @@
                   注册时间
                 </div>
               </template>
-              {{ formatDate(userInfo.created_at) }}
+              {{ userInfo.created_at ? formatDate(userInfo.created_at) : '未知' }}
             </el-descriptions-item>
             <el-descriptions-item>
               <template #label>
@@ -172,7 +172,7 @@
                   最后更新
                 </div>
               </template>
-              {{ formatDate(userInfo.updated_at) }}
+              {{ userInfo.updated_at ? formatDate(userInfo.updated_at) : '未知' }}
             </el-descriptions-item>
           </el-descriptions>
         </el-card>
@@ -202,7 +202,7 @@
               :on-change="handleAvatarChange"
               :auto-upload="false"
             >
-              <img v-if="editValue" :src="editValue" class="avatar-preview" />
+              <img v-if="editValue" :src="getAvatarUrl(editValue)" class="avatar-preview" />
               <el-icon v-else class="avatar-uploader-icon"><Plus /></el-icon>
             </el-upload>
             <div class="upload-tips">
@@ -219,11 +219,19 @@
           />
           <!-- 多行文本输入框 -->
           <el-input
-            v-else
+            v-else-if="editField === 'farm_info'"
             v-model="editValue"
             type="textarea"
             :rows="4"
             :placeholder="getPlaceholder(editField)"
+          />
+          <!-- 普通文本输入框 -->
+          <el-input
+            v-else
+            v-model="editValue"
+            :type="getInputType(editField)"
+            :placeholder="getPlaceholder(editField)"
+            clearable
           />
         </el-form-item>
       </el-form>
@@ -320,38 +328,39 @@ import {
   Phone, Location, Grid, Plus
 } from '@element-plus/icons-vue'
 import BottomNav from '@/components/common/BottomNav.vue'
+import { userAPI, farmerAPI, authAPI } from '@/services/api'
 
 const router = useRouter()
 
-// 用户基本信息（模拟数据，对应users表）
+// 用户基本信息（从后端API获取，对应users表）
 const userInfo = ref({
-  id: 1,
-  account: 'farmer001',
-  password: '******',
-  created_at: new Date('2024-01-15'),
-  updated_at: new Date('2024-07-20'),
-  status: 1
+  id: null,
+  account: '',
+  created_at: null,
+  updated_at: null,
+  status: 1,
+  roles: 'farmer'
 })
 
-// 农户档案信息（模拟数据，对应farmer_profiles表）
+// 农户档案信息（从后端API获取，对应farmer_profiles表）
 const farmerProfile = ref({
-  id: 1,
-  user_id: 1,
-  real_name: '张大力',
-  contact_phone: '13812345678',
-  farm_location: '江苏省苏州市吴中区东山镇农业园区',
-  farm_description: '占地15亩的现代化农场，主要种植优质水稻和小麦，采用生态种植技术，致力于为消费者提供绿色健康的农产品。',
+  id: null,
+  user_id: null,
+  name: '',
+  phone: '',
+  location: '',
+  farm_info: '',
   avatar_url: '',
-  created_at: new Date('2024-01-15'),
-  updated_at: new Date('2024-07-20')
+  created_at: null,
+  updated_at: null
 })
 
 // 农户档案配置
 const profileItems = ref([
-  { key: 'real_name', label: '真实姓名', icon: User, iconColor: '#3b82f6' },
-  { key: 'contact_phone', label: '联系电话', icon: Phone, iconColor: '#16a34a' },
-  { key: 'farm_location', label: '农场地理位置', icon: Location, iconColor: '#ef4444' },
-  { key: 'farm_description', label: '农场详细信息', icon: Grid, iconColor: '#f59e0b' },
+  { key: 'name', label: '真实姓名', icon: User, iconColor: '#3b82f6' },
+  { key: 'phone', label: '联系电话', icon: Phone, iconColor: '#16a34a' },
+  { key: 'location', label: '农场地理位置', icon: Location, iconColor: '#ef4444' },
+  { key: 'farm_info', label: '农场详细信息', icon: Grid, iconColor: '#f59e0b' },
   { key: 'avatar_url', label: '头像图片', icon: User, iconColor: '#8b5cf6' }
 ])
 
@@ -374,6 +383,9 @@ const confirmPassword = ref('')
 
 // 头像上传相关
 const uploadedFile = ref<File | null>(null)
+
+// 加载状态
+const loading = ref(false)
 
 // 底部导航配置 - FarmerSettings页面应该高亮"设置"
 const navItems = [
@@ -407,10 +419,10 @@ const navItems = [
 // 计算属性
 const editModalTitle = computed(() => {
   const fieldNames: Record<string, string> = {
-    real_name: '编辑真实姓名',
-    contact_phone: '编辑联系电话',
-    farm_location: '编辑农场地理位置',
-    farm_description: '编辑农场详细信息',
+    name: '编辑真实姓名',
+    phone: '编辑联系电话',
+    location: '编辑农场地理位置',
+    farm_info: '编辑农场详细信息',
     avatar_url: '编辑头像图片'
   }
   return fieldNames[editField.value] || '编辑信息'
@@ -418,37 +430,50 @@ const editModalTitle = computed(() => {
 
 const editFieldLabel = computed(() => {
   const fieldLabels: Record<string, string> = {
-    real_name: '真实姓名',
-    contact_phone: '联系电话',
-    farm_location: '农场地理位置',
-    farm_description: '农场详细信息',
+    name: '真实姓名',
+    phone: '联系电话',
+    location: '农场地理位置',
+    farm_info: '农场详细信息',
     avatar_url: '头像图片'
   }
   return fieldLabels[editField.value] || '信息'
 })
 
 // 格式化日期
-const formatDate = (date: Date) => {
-  return date.toLocaleDateString('zh-CN', {
+const formatDate = (date: Date | string | null) => {
+  if (!date) return '未知'
+  const dateObj = typeof date === 'string' ? new Date(date) : date
+  return dateObj.toLocaleDateString('zh-CN', {
     year: 'numeric',
     month: 'long',
     day: 'numeric'
   })
 }
 
+// 获取头像完整URL
+const getAvatarUrl = (url: string | null) => {
+  if (!url) return ''
+  // 如果是相对路径，添加后端域名
+  if (url.startsWith('/uploads/')) {
+    return `http://localhost:3001${url}`
+  }
+  // 如果已经是完整URL或blob URL，直接返回
+  return url
+}
+
 // 获取输入框类型
 const getInputType = (field: string) => {
-  if (field === 'contact_phone') return 'tel'
+  if (field === 'phone') return 'tel'
   return 'text'
 }
 
 // 获取占位符
 const getPlaceholder = (field: string) => {
   const placeholders: Record<string, string> = {
-    real_name: '请输入您的真实姓名',
-    contact_phone: '请输入11位手机号码',
-    farm_location: '请输入农场地理位置',
-    farm_description: '请输入农场简介和详细信息',
+    name: '请输入您的真实姓名',
+    phone: '请输入11位手机号码',
+    location: '请输入农场地理位置',
+    farm_info: '请输入农场简介和详细信息',
     avatar_url: '请上传头像图片'
   }
   return placeholders[field] || '请输入信息'
@@ -469,7 +494,7 @@ const saveProfile = async () => {
   }
   
   // 简单验证
-  if (editField.value === 'contact_phone' && !/^1[3-9]\d{9}$/.test(editValue.value)) {
+  if (editField.value === 'phone' && !/^1[3-9]\d{9}$/.test(editValue.value)) {
     ElMessage.error('请输入正确的手机号码格式')
     return
   }
@@ -477,29 +502,44 @@ const saveProfile = async () => {
   saveLoading.value = true
   
   try {
-    // 模拟异步保存
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-    
     // 处理头像上传
     if (editField.value === 'avatar_url' && uploadedFile.value) {
-      // 在真实项目中，这里应该上传文件到服务器
-      // 现在我们使用本地文件URL作为模拟
-      const localUrl = URL.createObjectURL(uploadedFile.value)
-      editValue.value = localUrl
+      const uploadResponse = await farmerAPI.uploadAvatar(uploadedFile.value)
+      if (uploadResponse.success) {
+        editValue.value = uploadResponse.data.avatar_url
+      } else {
+        throw new Error(uploadResponse.message || '头像上传失败')
+      }
     }
     
-    // 模拟保存到数据库
-    const profile = farmerProfile.value as any
-    profile[editField.value] = editValue.value
-    farmerProfile.value.updated_at = new Date()
+    // 更新其他字段
+    if (editField.value !== 'avatar_url') {
+      const updateData: any = {}
+      updateData[editField.value] = editValue.value
+      
+      const response = await farmerAPI.updateProfile(updateData)
+      if (!response.success) {
+        throw new Error(response.message || '更新失败')
+      }
+    } else if (uploadedFile.value) {
+      // 头像上传后不需要再次调用更新接口，因为上传接口已经更新了数据库
+    }
+    
+    // 更新本地数据
+    if (farmerProfile.value) {
+      const profile = farmerProfile.value as any
+      profile[editField.value] = editValue.value
+      profile.updated_at = new Date().toISOString()
+    }
     
     showEditModal.value = false
     ElMessage.success('保存成功！')
     
     // 清理上传文件引用
     uploadedFile.value = null
-  } catch (error) {
-    ElMessage.error('保存失败，请重试')
+  } catch (error: any) {
+    console.error('保存失败:', error)
+    ElMessage.error(error.message || '保存失败，请重试')
   } finally {
     saveLoading.value = false
   }
@@ -533,17 +573,21 @@ const savePassword = async () => {
   passwordLoading.value = true
   
   try {
-    // 模拟异步保存
-    await new Promise((resolve) => setTimeout(resolve, 1500))
+    const response = await userAPI.changePassword(oldPassword.value, newPassword.value)
     
-    // 模拟密码验证和保存
-    // TODO: 实际项目中需要调用后端接口验证旧密码并保存新密码
-    userInfo.value.updated_at = new Date()
-    
-    showPasswordModal.value = false
-    ElMessage.success('密码修改成功！')
-  } catch (error) {
-    ElMessage.error('密码修改失败，请重试')
+    if (response.success) {
+      showPasswordModal.value = false
+      ElMessage.success('密码修改成功！')
+      // 重置表单
+      oldPassword.value = ''
+      newPassword.value = ''
+      confirmPassword.value = ''
+    } else {
+      throw new Error(response.message || '密码修改失败')
+    }
+  } catch (error: any) {
+    console.error('密码修改失败:', error)
+    ElMessage.error(error.message || '密码修改失败，请重试')
   } finally {
     passwordLoading.value = false
   }
@@ -562,12 +606,23 @@ const logout = async () => {
       }
     )
     
-    // 模拟清除登录状态
-    // TODO: 实际项目中需要清除token等认证信息
+    // 调用后端退出接口
+    await authAPI.logout()
+    
+    // 清除本地存储的token
+    localStorage.removeItem('token')
+    localStorage.removeItem('farmer')
+    
     ElMessage.success('已退出登录')
-    router.push({ name: 'Login' })
-  } catch {
-    // 用户取消退出
+    router.push({ name: 'HomePage' })
+  } catch (error: any) {
+    if (error !== 'cancel') {
+      console.error('退出登录失败:', error)
+      // 即使后端调用失败，也清除本地token
+      localStorage.removeItem('token')
+      localStorage.removeItem('farmer')
+      router.push({ name: 'HomePage' })
+    }
   }
 }
 
@@ -599,9 +654,8 @@ const handleAvatarChange = (file: any) => {
   }
 }
 
-const handleAvatarSuccess = (response: any, file: any) => {
-  // 上传成功后的处理逻辑
-  editValue.value = URL.createObjectURL(file.raw)
+const handleAvatarSuccess = () => {
+  // 上传成功后的处理逻辑，在saveProfile中处理
 }
 
 // 弹窗关闭处理
@@ -617,10 +671,39 @@ const handlePasswordClose = (done: () => void) => {
   done()
 }
 
+// 获取用户信息和农户档案
+const fetchUserProfile = async () => {
+  try {
+    loading.value = true
+    const response = await userAPI.getProfile()
+    
+    if (response.success) {
+      userInfo.value = response.data.userInfo
+      farmerProfile.value = response.data.farmerProfile || {
+        id: null,
+        user_id: null,
+        name: '',
+        phone: '',
+        location: '',
+        farm_info: '',
+        avatar_url: '',
+        created_at: null,
+        updated_at: null
+      }
+    } else {
+      ElMessage.error(response.message || '获取用户信息失败')
+    }
+  } catch (error: any) {
+    console.error('获取用户信息失败:', error)
+    ElMessage.error(error.message || '获取用户信息失败')
+  } finally {
+    loading.value = false
+  }
+}
+
 // 页面初始化
 onMounted(() => {
-  // 模拟从后端获取用户信息
-  // TODO: 实际项目中调用API获取数据
+  fetchUserProfile()
 })
 </script>
 

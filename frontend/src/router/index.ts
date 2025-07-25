@@ -153,12 +153,32 @@ router.beforeEach((to, from, next) => {
   
   // 检查认证状态
   if (to.meta.requiresAuth) {
-    // 这里可以添加认证检查逻辑
-    // const isAuthenticated = checkAuthStatus()
-    // if (!isAuthenticated) {
-    //   next('/farmer/login')
-    //   return
-    // }
+    const token = localStorage.getItem('token')
+    if (!token) {
+      // 用户未登录，跳转到登录页
+      next('/farmer/login')
+      return
+    }
+    
+    // 简单验证token格式是否正确
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]))
+      const currentTime = Date.now() / 1000
+      
+      if (payload.exp < currentTime) {
+        // token已过期，清除并跳转登录页
+        localStorage.removeItem('token')
+        localStorage.removeItem('farmer')
+        next('/farmer/login')
+        return
+      }
+    } catch (error) {
+      // token格式错误，清除并跳转登录页
+      localStorage.removeItem('token')
+      localStorage.removeItem('farmer')
+      next('/farmer/login')
+      return
+    }
   }
   
   next()

@@ -63,4 +63,16 @@ export class FarmerModel {
       throw new Error(`Failed to update farmer status: ${error}`);
     }
   }
+
+  static async updatePassword(id: number, newPassword: string): Promise<boolean> {
+    try {
+      const [result] = await pool.execute(
+        'UPDATE users SET password = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?',
+        [newPassword, id]
+      );
+      return (result as any).affectedRows > 0;
+    } catch (error) {
+      throw new Error(`Failed to update farmer password: ${error}`);
+    }
+  }
 }

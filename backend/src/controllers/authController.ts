@@ -130,3 +130,20 @@ export const login = async (req: Request, res: Response) => {
     });
   }
 };
+
+export const logout = async (req: Request, res: Response) => {
+  try {
+    // 简单的退出登录响应
+    // 在实际项目中，可以考虑实现JWT黑名单机制
+    res.json({
+      success: true,
+      message: '退出登录成功'
+    });
+  } catch (error) {
+    console.error('Logout error:', error);
+    res.status(500).json({
+      success: false,
+      message: '服务器内部错误'
+    });
+  }
+};

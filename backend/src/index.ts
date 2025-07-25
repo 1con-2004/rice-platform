@@ -1,7 +1,10 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import path from 'path';
 import authRoutes from './routes/authRoutes';
+import userRoutes from './routes/userRoutes';
+import farmerRoutes from './routes/farmerRoutes';
 import { testConnection } from './config/database';
 
 dotenv.config();
@@ -17,7 +20,13 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// 静态文件服务 - 用于提供上传的头像图片
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+
+// 路由配置
 app.use('/api/auth', authRoutes);
+app.use('/api/user', userRoutes);
+app.use('/api/farmer', farmerRoutes);
 
 app.get('/api/health', (req: express.Request, res: express.Response) => {
   res.json({ 
