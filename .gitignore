@@ -1,1 +1,36 @@
 .DS_Store
+node_modules
+
+# Playwright 相关文件
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+
+# Playwright 调试和临时文件
+test-debug-log.txt
+selector-suggestions.txt
+playwright-best-practices.md
+
+# Playwright 浏览器下载缓存
+~/.cache/ms-playwright/
+
+# Playwright 配置备份
+playwright.config.old.ts
+
+# 测试执行时的临时文件
+*.webm
+error-context.md
+
+# 测试报告和截图（可选择性忽略）
+# 如果你想保留这些文件用于分析，可以注释掉下面的行
+screenshots/
+videos/
+traces/
+
+# 环境变量和敏感配置
+.env.test
+.env.local
+
+# TypeScript 编译输出
+*.tsbuildinfo

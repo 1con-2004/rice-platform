@@ -1,0 +1,16 @@
+{
+	"devDependencies": {
+		"@playwright/test": "^1.54.1",
+		"@types/node": "^24.1.0",
+		"typescript": "^5.8.3"
+	},
+	"scripts": {
+		"test:e2e": "playwright test",
+		"test:e2e:ui": "playwright test --ui",
+		"test:e2e:headed": "playwright test --headed",
+		"test:debug": "node scripts/auto-test-debug.js --auto",
+		"test:fix": "node scripts/smart-selector-fix.js --fix && pnpm run test:e2e",
+		"test:debug-simple": "playwright test --config=playwright.config.debug.ts",
+		"test:core": "playwright test tests/core-functionality.spec.ts --config=playwright.config.debug.ts"
+	}
+}
