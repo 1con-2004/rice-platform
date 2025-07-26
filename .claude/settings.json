@@ -10,7 +10,18 @@
           },
           {
             "type": "command",
-            "command": "chmod +x /Users/apple/Desktop/项目/rice-platform/notify_confirm.sh\\\n/Users/apple/Desktop/项目/rice-platform/notify_confirm.sh"
+            "command": "chmod +x /Users/apple/Desktop/项目/rice-platform/notify_confirm.sh\n/Users/apple/Desktop/项目/rice-platform/notify_confirm.sh"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Task|Bash|Read|Edit|MultiEdit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "chmod +x /Users/apple/Desktop/项目/rice-platform/notify_confirm.sh\\n/Users/apple/Desktop/项目/rice-platform/notify_confirm.sh"
           }
         ]
       }

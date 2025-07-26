@@ -7,7 +7,7 @@ echo "任务确认提醒..."
 
 # 播放5次系统提示音
 for i in {1..2}; do
-    afplay /System/Library/Sounds/Funk.aiff
+    afplay /System/Library/Sounds/Glass.aiff
     sleep 0.1  # 每次播放间隔0.1秒
 done
 
