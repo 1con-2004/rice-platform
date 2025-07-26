@@ -1,54 +1,61 @@
 version: '3.8'
 
 services:
+  # 数据库服务
+  db:
+    image: mysql:8.0
+    container_name: rice-platform-db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: rice_platform
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - rice-platform-network
+
+  # 后端服务
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "4001:4001"
+    container_name: rice-platform-backend
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=docker
+    env_file:
+      - ./backend/.env.docker
+    volumes:
+      - ./backend/uploads:/app/uploads
+    networks:
+      - rice-platform-network
+    depends_on:
+      - db
+
   # 前端服务
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
     ports:
-      - "3000:80"
+      - "4000:4000"
     container_name: rice-platform-frontend
     restart: unless-stopped
+    volumes:
+      - ./frontend/src:/app/src
+      - ./frontend/public:/app/public
     networks:
       - rice-platform-network
-
-  # 预留后端服务配置（待后端开发完成后启用）
-  # backend:
-  #   build:
-  #     context: ./backend
-  #     dockerfile: Dockerfile
-  #   ports:
-  #     - "8000:8000"
-  #   container_name: rice-platform-backend
-  #   restart: unless-stopped
-  #   environment:
-  #     - NODE_ENV=production
-  #   networks:
-  #     - rice-platform-network
-  #   depends_on:
-  #     - database
-
-  # 预留数据库服务配置
-  # database:
-  #   image: postgres:15-alpine
-  #   container_name: rice-platform-db
-  #   restart: unless-stopped
-  #   environment:
-  #     POSTGRES_DB: rice_platform
-  #     POSTGRES_USER: rice_user
-  #     POSTGRES_PASSWORD: rice_password
-  #   volumes:
-  #     - postgres_data:/var/lib/postgresql/data
-  #   networks:
-  #     - rice-platform-network
-  #   ports:
-  #     - "5432:5432"
+    depends_on:
+      - backend
 
 networks:
   rice-platform-network:
     driver: bridge
 
-# 预留数据卷配置
-# volumes:
-#   postgres_data:
+volumes:
+  mysql_data:

@@ -13,7 +13,11 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 
 app.use(cors({
-  origin: ['http://localhost:5173', 'http://localhost:3000'],
+  origin: [
+    'http://localhost:5173',  // Vite本地开发
+    'http://localhost:3000',  // 前端本地开发
+    'http://localhost:4000'   // Docker前端环境
+  ],
   credentials: true
 }));
 

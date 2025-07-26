@@ -1,5 +1,15 @@
-// API 基础配置
-const API_BASE_URL = 'http://localhost:3001/api'
+// API 基础配置 - 根据环境自动切换
+const getApiBaseUrl = () => {
+  // 检查是否在Docker环境中运行
+  if (window.location.hostname === 'localhost' && window.location.port === '4000') {
+    // Docker环境
+    return 'http://localhost:4001/api'
+  }
+  // 本地开发环境
+  return 'http://localhost:3001/api'
+}
+
+const API_BASE_URL = getApiBaseUrl()
 
 // 获取存储的token
 const getToken = () => {
