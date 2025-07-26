@@ -1,0 +1,19 @@
+{
+  "hooks": {
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "chmod +x /Users/apple/Desktop/项目/rice-platform/notify_complete.sh\n/Users/apple/Desktop/项目/rice-platform/notify_complete.sh"
+          },
+          {
+            "type": "command",
+            "command": "chmod +x /Users/apple/Desktop/项目/rice-platform/notify_confirm.sh\\\n/Users/apple/Desktop/项目/rice-platform/notify_confirm.sh"
+          }
+        ]
+      }
+    ]
+  }
+}
